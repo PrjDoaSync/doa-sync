@@ -1,46 +1,65 @@
-using Microsoft.AspNetCore.Mvc;
 using api.Models;
 using api.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/pessoafisica")]
     public class PessoaFisicaController : ControllerBase
     {
-        private readonly PessoaFisicaRepository _repository = new();
+        private readonly IPessoaFisicaRepository _repository;
+
+        // O ASP.NET Core injeta a implementação do IPessoaFisicaRepository (que agora é o PessoaFisicaRepository com EF Core)
+        public PessoaFisicaController(IPessoaFisicaRepository repository)
+        {
+            _repository = repository;
+        }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_repository.GetAll());
+        public IActionResult GetAll()
+        {
+            var pessoas = _repository.GetAll();
+            return Ok(pessoas);
+        }
 
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var pessoa = _repository.GetById(id);
-            if (pessoa == null) return NotFound("Pessoa Física não encontrada!");
+            if (pessoa == null)
+            {
+                return NotFound();
+            }
             return Ok(pessoa);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] PessoaFisicaModel pessoa)
+        public IActionResult Add(PessoaFisicaModel pessoa)
         {
             var novaPessoa = _repository.Add(pessoa);
             return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Id }, novaPessoa);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] PessoaFisicaModel pessoaAtualizada)
+        public IActionResult Update(int id, PessoaFisicaModel pessoaAtualizada)
         {
-            var atualizado = _repository.Update(id, pessoaAtualizada);
-            if (!atualizado) return NotFound("Pessoa Física não encontrada!");
+            var sucesso = _repository.Update(id, pessoaAtualizada);
+            if (!sucesso)
+            {
+                return NotFound();
+            }
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var deletado = _repository.Delete(id);
-            if (!deletado) return NotFound("Pessoa Física não encontrada!");
+            var sucesso = _repository.Delete(id);
+            if (!sucesso)
+            {
+                return NotFound();
+            }
             return NoContent();
         }
     }

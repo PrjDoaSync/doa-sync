@@ -1,47 +1,59 @@
 using api.Models;
+using api.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace api.Repositories
 {
-    public class PessoaFisicaRepository
+    public class PessoaFisicaRepository : IPessoaFisicaRepository
     {
-        private static List<PessoaFisicaModel> pessoasFisicas = new();
+        private readonly ApplicationDbContext _context;
+
+        public PessoaFisicaRepository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public IEnumerable<PessoaFisicaModel> GetAll()
         {
-            return pessoasFisicas;
+            return _context.PessoasFisicas.ToList();
         }
 
         public PessoaFisicaModel? GetById(int id)
         {
-            return pessoasFisicas.FirstOrDefault(p => p.Id == id);
+            return _context.PessoasFisicas.FirstOrDefault(p => p.Id == id);
         }
 
         public PessoaFisicaModel Add(PessoaFisicaModel pessoa)
         {
-            pessoa.Id = pessoasFisicas.Count > 0 ? pessoasFisicas.Max(p => p.Id) + 1 : 1;
-            pessoasFisicas.Add(pessoa);
+            _context.PessoasFisicas.Add(pessoa);
+            _context.SaveChanges();
             return pessoa;
         }
 
         public bool Update(int id, PessoaFisicaModel pessoaAtualizada)
         {
-            var pessoa = GetById(id);
-            if (pessoa == null) return false;
+            var pessoaExistente = _context.PessoasFisicas.FirstOrDefault(p => p.Id == id);
+            
+            if (pessoaExistente == null) return false;
 
-            pessoa.Nome = pessoaAtualizada.Nome;
-            pessoa.Sobrenome = pessoaAtualizada.Sobrenome;
-            pessoa.CPF = pessoaAtualizada.CPF;
-            pessoa.RG = pessoaAtualizada.RG;
+            pessoaExistente.Nome = pessoaAtualizada.Nome;
+            pessoaExistente.Sobrenome = pessoaAtualizada.Sobrenome;
+            pessoaExistente.CPF = pessoaAtualizada.CPF;
+            pessoaExistente.RG = pessoaAtualizada.RG;
+            
+            _context.SaveChanges();
             return true;
         }
 
         public bool Delete(int id)
         {
-            var pessoa = GetById(id);
+            var pessoa = _context.PessoasFisicas.FirstOrDefault(p => p.Id == id);
             if (pessoa == null) return false;
-            pessoasFisicas.Remove(pessoa);
+            
+            _context.PessoasFisicas.Remove(pessoa);
+            _context.SaveChanges();
             return true;
         }
     }
