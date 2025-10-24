@@ -18,5 +18,8 @@ namespace api.Data
             base.OnModelCreating(modelBuilder);
             
         }
+        public DbSet<api.Models.Endereco> Endereco { get; set; } = default!;
+        public DbSet<api.Models.Telefone> Telefone { get; set; } = default!;
+        public DbSet<api.Models.Usuario> Usuario { get; set; } = default!;
     }
 }

@@ -1,66 +1,95 @@
-using api.Models;
-using api.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using api.Data;
+using api.Models;
+
 
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/pessoajuridica")]
+    [Route("api/[controller]")]
     public class PessoaJuridicaController : ControllerBase
     {
-        private readonly IPessoaJuridicaRepository _repository;
+        private readonly ApplicationDbContext _context;
 
-        // O ASP.NET Core injeta a implementação do IPessoaJuridicaRepository (que agora é o PessoaJuridicaRepository com EF Core)
-        public PessoaJuridicaController(IPessoaJuridicaRepository repository)
+        public PessoaJuridicaController(ApplicationDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<ActionResult<IEnumerable<PessoaJuridicaModel>>> GetPessoasJuridicas()
         {
-            var pessoas = _repository.GetAll();
-            return Ok(pessoas);
+            return await _context.PessoasJuridicas.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ActionResult<PessoaJuridicaModel>> GetPessoaJuridica(int id)
         {
-            var pessoa = _repository.GetById(id);
-            if (pessoa == null)
-            {
+            var pessoaJuridica = await _context.PessoasJuridicas
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (pessoaJuridica == null)
                 return NotFound();
-            }
-            return Ok(pessoa);
+
+            return pessoaJuridica;
         }
 
         [HttpPost]
-        public IActionResult Add(PessoaJuridicaModel pessoa)
+        public async Task<ActionResult<PessoaJuridicaModel>> PostPessoaJuridica(PessoaJuridicaModel pessoaJuridica)
         {
-            var novaPessoa = _repository.Add(pessoa);
-            return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Id }, novaPessoa);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.PessoasJuridicas.Add(pessoaJuridica);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPessoaJuridica), new { id = pessoaJuridica.Id }, pessoaJuridica);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, PessoaJuridicaModel pessoaAtualizada)
+        public async Task<IActionResult> PutPessoaJuridica(int id, PessoaJuridicaModel pessoaJuridica)
         {
-            var sucesso = _repository.Update(id, pessoaAtualizada);
-            if (!sucesso)
+            if (id != pessoaJuridica.Id)
+                return BadRequest();
+
+            _context.Entry(pessoaJuridica).State = EntityState.Modified;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PessoaJuridicaModelExists(id))
+                    return NotFound();
+                throw;
+            }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeletePessoaJuridica(int id)
         {
-            var sucesso = _repository.Delete(id);
-            if (!sucesso)
-            {
+            var pessoaJuridica = await _context.PessoasJuridicas.FindAsync(id);
+            if (pessoaJuridica == null)
                 return NotFound();
-            }
+
+            _context.PessoasJuridicas.Remove(pessoaJuridica);
+            await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool PessoaJuridicaModelExists(int id)
+        {
+            return _context.PessoasJuridicas.Any(e => e.Id == id);
         }
     }
 }

@@ -1,66 +1,95 @@
-using api.Models;
-using api.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using api.Data;
+using api.Models;
+
 
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/pessoafisica")]
+    [Route("api/[controller]")]
     public class PessoaFisicaController : ControllerBase
     {
-        private readonly IPessoaFisicaRepository _repository;
+        private readonly ApplicationDbContext _context;
 
-        // O ASP.NET Core injeta a implementação do IPessoaFisicaRepository (que agora é o PessoaFisicaRepository com EF Core)
-        public PessoaFisicaController(IPessoaFisicaRepository repository)
+        public PessoaFisicaController(ApplicationDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<ActionResult<IEnumerable<PessoaFisicaModel>>> GetPessoasFisicas()
         {
-            var pessoas = _repository.GetAll();
-            return Ok(pessoas);
+            return await _context.PessoasFisicas.ToListAsync();
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ActionResult<PessoaFisicaModel>> GetPessoaFisica(int id)
         {
-            var pessoa = _repository.GetById(id);
-            if (pessoa == null)
-            {
+            var pessoaFisica = await _context.PessoasFisicas
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (pessoaFisica == null)
                 return NotFound();
-            }
-            return Ok(pessoa);
+
+            return pessoaFisica;
         }
 
         [HttpPost]
-        public IActionResult Add(PessoaFisicaModel pessoa)
+        public async Task<ActionResult<PessoaFisicaModel>> PostPessoaFisica(PessoaFisicaModel pessoaFisica)
         {
-            var novaPessoa = _repository.Add(pessoa);
-            return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Id }, novaPessoa);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.PessoasFisicas.Add(pessoaFisica);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPessoaFisica), new { id = pessoaFisica.Id }, pessoaFisica);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, PessoaFisicaModel pessoaAtualizada)
+        public async Task<IActionResult> PutPessoaFisica(int id, PessoaFisicaModel pessoaFisica)
         {
-            var sucesso = _repository.Update(id, pessoaAtualizada);
-            if (!sucesso)
+            if (id != pessoaFisica.Id)
+                return BadRequest();
+
+            _context.Entry(pessoaFisica).State = EntityState.Modified;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PessoaFisicaModelExists(id))
+                    return NotFound();
+                throw;
+            }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeletePessoaFisica(int id)
         {
-            var sucesso = _repository.Delete(id);
-            if (!sucesso)
-            {
+            var pessoaFisica = await _context.PessoasFisicas.FindAsync(id);
+            if (pessoaFisica == null)
                 return NotFound();
-            }
+
+            _context.PessoasFisicas.Remove(pessoaFisica);
+            await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool PessoaFisicaModelExists(int id)
+        {
+            return _context.PessoasFisicas.Any(e => e.Id == id);
         }
     }
 }
