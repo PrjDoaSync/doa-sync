@@ -21,7 +21,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API do sistema Doa Sync"
     });
 });
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
