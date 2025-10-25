@@ -1,0 +1,6 @@
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.AssemblyInfoInputs.cache
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.AssemblyInfo.cs
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.csproj.CoreCompileInputs.cache
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\obj\Debug\net8.0\api.sourcelink.json

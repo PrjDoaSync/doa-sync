@@ -1,13 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vYpdJm15EHg=",
+  "dgSpecHash": "+Pl7GAn0Cm0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Joao Machado\\Documents\\DoaSync\\doa-sync\\api\\api.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Joao Machado\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.16\\microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
-    "C:\\Users\\Joao Machado\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.16\\microsoft.windowsdesktop.app.ref.8.0.16.nupkg.sha512",
-    "C:\\Users\\Joao Machado\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.16\\microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512",
-    "C:\\Users\\Joao Machado\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.16\\microsoft.netcore.app.host.win-x64.8.0.16.nupkg.sha512"
-  ],
+  "projectFilePath": "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }
