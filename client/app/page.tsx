@@ -1,3 +1,26 @@
-export default function Home() {
-  return <h1>Hello, World!</h1>;
-}
+import CadastroForm from "./components/pages/CadastroForm";
+import LoginForm from "./components/pages/LoginForm";
+import RecoverSenha from "./components/pages/RecoverSenha";
+
+
+export default function Home (){
+  return(
+    <LoginForm />
+    //<CadastroForm />
+    //<RecoverSenha />
+  )
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
