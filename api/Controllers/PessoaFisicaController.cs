@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using api.Data;
 using api.Models;
-using api.Repositories;
+
 
 namespace api.Controllers
 {
@@ -8,40 +15,81 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class PessoaFisicaController : ControllerBase
     {
-        private readonly PessoaFisicaRepository _repository = new();
+        private readonly ApplicationDbContext _context;
+
+        public PessoaFisicaController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_repository.GetAll());
+        public async Task<ActionResult<IEnumerable<PessoaFisicaModel>>> GetPessoasFisicas()
+        {
+            return await _context.PessoasFisicas.ToListAsync();
+        }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ActionResult<PessoaFisicaModel>> GetPessoaFisica(int id)
         {
-            var pessoa = _repository.GetById(id);
-            if (pessoa == null) return NotFound("Pessoa Física não encontrada!");
-            return Ok(pessoa);
+            var pessoaFisica = await _context.PessoasFisicas
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (pessoaFisica == null)
+                return NotFound();
+
+            return pessoaFisica;
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] PessoaFisicaModel pessoa)
+        public async Task<ActionResult<PessoaFisicaModel>> PostPessoaFisica(PessoaFisicaModel pessoaFisica)
         {
-            var novaPessoa = _repository.Add(pessoa);
-            return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Id }, novaPessoa);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.PessoasFisicas.Add(pessoaFisica);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPessoaFisica), new { id = pessoaFisica.Id }, pessoaFisica);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] PessoaFisicaModel pessoaAtualizada)
+        public async Task<IActionResult> PutPessoaFisica(int id, PessoaFisicaModel pessoaFisica)
         {
-            var atualizado = _repository.Update(id, pessoaAtualizada);
-            if (!atualizado) return NotFound("Pessoa Física não encontrada!");
+            if (id != pessoaFisica.Id)
+                return BadRequest();
+
+            _context.Entry(pessoaFisica).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PessoaFisicaModelExists(id))
+                    return NotFound();
+                throw;
+            }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeletePessoaFisica(int id)
         {
-            var deletado = _repository.Delete(id);
-            if (!deletado) return NotFound("Pessoa Física não encontrada!");
+            var pessoaFisica = await _context.PessoasFisicas.FindAsync(id);
+            if (pessoaFisica == null)
+                return NotFound();
+
+            _context.PessoasFisicas.Remove(pessoaFisica);
+            await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool PessoaFisicaModelExists(int id)
+        {
+            return _context.PessoasFisicas.Any(e => e.Id == id);
         }
     }
 }

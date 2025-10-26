@@ -1,6 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using api.Data;
 using api.Models;
-using api.Repositories;
+
 
 namespace api.Controllers
 {
@@ -8,40 +15,81 @@ namespace api.Controllers
     [Route("api/[controller]")]
     public class PessoaJuridicaController : ControllerBase
     {
-        private readonly PessoaJuridicaRepository _repository = new();
+        private readonly ApplicationDbContext _context;
+
+        public PessoaJuridicaController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
-        public IActionResult GetAll() => Ok(_repository.GetAll());
+        public async Task<ActionResult<IEnumerable<PessoaJuridicaModel>>> GetPessoasJuridicas()
+        {
+            return await _context.PessoasJuridicas.ToListAsync();
+        }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<ActionResult<PessoaJuridicaModel>> GetPessoaJuridica(int id)
         {
-            var pessoa = _repository.GetById(id);
-            if (pessoa == null) return NotFound("Pessoa Jurídica não encontrada!");
-            return Ok(pessoa);
+            var pessoaJuridica = await _context.PessoasJuridicas
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (pessoaJuridica == null)
+                return NotFound();
+
+            return pessoaJuridica;
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] PessoaJuridicaModel pessoa)
+        public async Task<ActionResult<PessoaJuridicaModel>> PostPessoaJuridica(PessoaJuridicaModel pessoaJuridica)
         {
-            var novaPessoa = _repository.Add(pessoa);
-            return CreatedAtAction(nameof(GetById), new { id = novaPessoa.Id }, novaPessoa);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.PessoasJuridicas.Add(pessoaJuridica);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPessoaJuridica), new { id = pessoaJuridica.Id }, pessoaJuridica);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] PessoaJuridicaModel pessoaAtualizada)
+        public async Task<IActionResult> PutPessoaJuridica(int id, PessoaJuridicaModel pessoaJuridica)
         {
-            var atualizado = _repository.Update(id, pessoaAtualizada);
-            if (!atualizado) return NotFound("Pessoa Jurídica não encontrada!");
+            if (id != pessoaJuridica.Id)
+                return BadRequest();
+
+            _context.Entry(pessoaJuridica).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PessoaJuridicaModelExists(id))
+                    return NotFound();
+                throw;
+            }
+
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeletePessoaJuridica(int id)
         {
-            var deletado = _repository.Delete(id);
-            if (!deletado) return NotFound("Pessoa Jurídica não encontrada!");
+            var pessoaJuridica = await _context.PessoasJuridicas.FindAsync(id);
+            if (pessoaJuridica == null)
+                return NotFound();
+
+            _context.PessoasJuridicas.Remove(pessoaJuridica);
+            await _context.SaveChangesAsync();
+
             return NoContent();
+        }
+
+        private bool PessoaJuridicaModelExists(int id)
+        {
+            return _context.PessoasJuridicas.Any(e => e.Id == id);
         }
     }
 }
