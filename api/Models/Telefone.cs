@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace api.Models
 {
     public class Telefone{
@@ -6,6 +8,8 @@ namespace api.Models
         public string Numero { get; set; } = string.Empty;
 
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; } = null!;
+        
+        [JsonIgnore]
+        public Usuario? Usuario { get; set; }
     }    
 }

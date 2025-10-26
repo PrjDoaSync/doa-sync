@@ -12,14 +12,14 @@ namespace api.Data
 
         public DbSet<PessoaFisicaModel> PessoasFisicas { get; set; } = default!;
         public DbSet<PessoaJuridicaModel> PessoasJuridicas { get; set; } = default!;
+        public DbSet<Endereco> Endereco { get; set; } = default!;
+        public DbSet<Telefone> Telefone { get; set; } = default!;
+        public DbSet<Usuario> Usuario { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             
         }
-        public DbSet<api.Models.Endereco> Endereco { get; set; } = default!;
-        public DbSet<api.Models.Telefone> Telefone { get; set; } = default!;
-        public DbSet<api.Models.Usuario> Usuario { get; set; } = default!;
     }
 }

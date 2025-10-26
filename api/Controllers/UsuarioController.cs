@@ -25,22 +25,26 @@ namespace api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> GetUsuarios()
         {
-            return await _context.Usuario.Include(u => u.Telefones)
-                                       .Include(u => u.Enderecos)
-                                       .ToListAsync();
+            return await _context.Usuario
+                .Include(u => u.PessoaFisica)
+                .Include(u => u.PessoaJuridica)
+                .Include(u => u.Telefones)
+                .Include(u => u.Enderecos)
+                .ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> GetUsuario(int id)
         {
-            var usuario = await _context.Usuario.Include(u => u.Telefones)
-                                              .Include(u => u.Enderecos)
-                                              .FirstOrDefaultAsync(u => u.Id == id);
+            var usuario = await _context.Usuario
+                .Include(u => u.PessoaFisica)
+                .Include(u => u.PessoaJuridica)
+                .Include(u => u.Telefones)
+                .Include(u => u.Enderecos)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (usuario == null)
-            {
                 return NotFound();
-            }
 
             return usuario;
         }

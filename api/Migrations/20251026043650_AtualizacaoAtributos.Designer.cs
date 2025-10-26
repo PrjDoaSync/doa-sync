@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
@@ -10,9 +11,11 @@ using api.Data;
 namespace api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251026043650_AtualizacaoAtributos")]
+    partial class AtualizacaoAtributos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,13 +90,7 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId")
-                        .IsUnique();
 
                     b.ToTable("PessoasFisicas");
                 });
@@ -118,13 +115,7 @@ namespace api.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId")
-                        .IsUnique();
 
                     b.ToTable("PessoasJuridicas");
                 });
@@ -194,28 +185,6 @@ namespace api.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("api.Models.PessoaFisicaModel", b =>
-                {
-                    b.HasOne("api.Models.Usuario", "Usuario")
-                        .WithOne("PessoaFisica")
-                        .HasForeignKey("api.Models.PessoaFisicaModel", "UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("api.Models.PessoaJuridicaModel", b =>
-                {
-                    b.HasOne("api.Models.Usuario", "Usuario")
-                        .WithOne("PessoaJuridica")
-                        .HasForeignKey("api.Models.PessoaJuridicaModel", "UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("api.Models.Telefone", b =>
                 {
                     b.HasOne("api.Models.Usuario", "Usuario")
@@ -230,10 +199,6 @@ namespace api.Migrations
             modelBuilder.Entity("api.Models.Usuario", b =>
                 {
                     b.Navigation("Enderecos");
-
-                    b.Navigation("PessoaFisica");
-
-                    b.Navigation("PessoaJuridica");
 
                     b.Navigation("Telefones");
                 });
