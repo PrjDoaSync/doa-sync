@@ -10,7 +10,7 @@ export default function CadastroForm (){
   return(
         
     <Layout>
-      <Title>Bem vindo ao <span className="text-[#FFD600]">DoaSync!</span></Title>
+      <Title>Crie sua conta no <span className="text-[#FFD600]">DoaSync!</span></Title>
       <Input placeholder="Nome Completo" type="text"></Input>
       <Input placeholder="Informe seu email" type="email"></Input>
       <Input placeholder="Informe sua senha" type="password"></Input>
