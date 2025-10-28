@@ -1,26 +1,5 @@
-import CadastroForm from "./components/pages/CadastroForm";
-import LoginForm from "./components/pages/LoginForm";
-import RecoverSenha from "./components/pages/RecoverSenha";
+const App = () => {
+  return <h1>App</h1>;
+};
 
-
-export default function Home (){
-  return(
-    <LoginForm />
-    //<CadastroForm />
-    //<RecoverSenha />
-  )
- }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default App;
