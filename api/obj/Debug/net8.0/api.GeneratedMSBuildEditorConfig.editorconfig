@@ -17,13 +17,19 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = api
 build_property.RootNamespace = api
+<<<<<<< HEAD
 build_property.ProjectDir = C:\Users\PEDRO VIEIRA\Desktop\doa-sync\api\
+=======
+build_property.ProjectDir = C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api\
+>>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+<<<<<<< HEAD
 build_property.MSBuildProjectDirectory = C:\Users\PEDRO VIEIRA\Desktop\doa-sync\api
+=======
+build_property.MSBuildProjectDirectory = C:\Users\Paola Costa\OneDrive\Área de Trabalho\doa-sync\api
+>>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
 build_property._RazorSourceGeneratorDebug = 
-build_property.EffectiveAnalysisLevelStyle = 8.0
-build_property.EnableCodeStyleSeverity = 

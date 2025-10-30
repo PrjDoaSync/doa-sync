@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\api.csproj": {}
   },
   "projects": {
@@ -15,6 +16,22 @@
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\PEDRO VIEIRA\\AppData\\Roaming\\NuGet\\NuGet.Config"
+=======
+    "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj",
+        "projectName": "api",
+        "projectPath": "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj",
+        "packagesPath": "C:\\Users\\Paola Costa\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Paola Costa\\AppData\\Roaming\\NuGet\\NuGet.Config"
+>>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -37,8 +54,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -114,7 +130,11 @@
               "privateAssets": "all"
             }
           },
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.409/PortableRuntimeIdentifierGraph.json"
+>>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
         }
       }
     }
