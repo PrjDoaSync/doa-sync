@@ -10,9 +10,9 @@ namespace api.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AuthController(DataContext context)
+        public AuthController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -26,7 +26,7 @@ namespace api.Controllers
             Console.WriteLine($"DTO recebido: {dto.UsernameOrEmail} / {dto.Password}");
 
             // Busca por username OU email
-            var user = await _context.Usuarios
+            var user = await _context.Usuario
                 .FirstOrDefaultAsync(u => 
                     u.Username == dto.UsernameOrEmail || 
                     u.Email == dto.UsernameOrEmail);

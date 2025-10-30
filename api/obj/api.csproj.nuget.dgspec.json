@@ -2,19 +2,24 @@
   "format": 1,
   "restore": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\api.csproj": {}
+=======
+    "C:\\Users\\Vitor Fogaca\\Desktop\\doa-sync\\api\\api.csproj": {}
+>>>>>>> 54959144bf77fb0492ec1172872406d840913942
   },
   "projects": {
-    "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\api.csproj": {
+    "C:\\Users\\Vitor Fogaca\\Desktop\\doa-sync\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\api.csproj",
+        "projectUniqueName": "C:\\Users\\Vitor Fogaca\\Desktop\\doa-sync\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\api.csproj",
-        "packagesPath": "C:\\Users\\PEDRO VIEIRA\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PEDRO VIEIRA\\Desktop\\doa-sync\\api\\obj\\",
+        "projectPath": "C:\\Users\\Vitor Fogaca\\Desktop\\doa-sync\\api\\api.csproj",
+        "packagesPath": "C:\\Users\\Vitor Fogaca\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Vitor Fogaca\\Desktop\\doa-sync\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\PEDRO VIEIRA\\AppData\\Roaming\\NuGet\\NuGet.Config"
 =======
     "C:\\Users\\Paola Costa\\OneDrive\\Área de Trabalho\\doa-sync\\api\\api.csproj": {}
@@ -32,6 +37,9 @@
         "configFilePaths": [
           "C:\\Users\\Paola Costa\\AppData\\Roaming\\NuGet\\NuGet.Config"
 >>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
+=======
+          "C:\\Users\\Vitor Fogaca\\AppData\\Roaming\\NuGet\\NuGet.Config"
+>>>>>>> 54959144bf77fb0492ec1172872406d840913942
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -49,11 +57,14 @@
           "warnAsError": [
             "NU1605"
           ]
+<<<<<<< HEAD
         },
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
+=======
+>>>>>>> 54959144bf77fb0492ec1172872406d840913942
         }
       },
       "frameworks": {
@@ -104,24 +115,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.19, 8.0.19]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.19, 8.0.19]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -131,10 +124,14 @@
             }
           },
 <<<<<<< HEAD
+<<<<<<< HEAD
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
 =======
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.409/PortableRuntimeIdentifierGraph.json"
 >>>>>>> 8b7b622d7fd7147c06594bd57ca48c68fc8a1cd9
+=======
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.121/PortableRuntimeIdentifierGraph.json"
+>>>>>>> 54959144bf77fb0492ec1172872406d840913942
         }
       }
     }
