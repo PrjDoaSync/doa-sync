@@ -1,8 +1,8 @@
 "use client";
 
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
-import Title from "@/components/ui/Title";
+import Button from "@/components/Button";
+import Input from "@/components/Input";
+import Title from "@/components/Title";
 
 export default function LoginForm() {
   return (
