@@ -1,6 +1,6 @@
-using System;
+using System.Text.Json.Serialization;
 
-namespace SeuProjeto.Models
+namespace api.Models
 {
     public class Doacao
     {

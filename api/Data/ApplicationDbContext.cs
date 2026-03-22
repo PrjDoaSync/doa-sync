@@ -1,6 +1,7 @@
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace api.Data
 {
     public class ApplicationDbContext : DbContext
@@ -15,6 +16,9 @@ namespace api.Data
         public DbSet<Endereco> Endereco { get; set; } = default!;
         public DbSet<Telefone> Telefone { get; set; } = default!;
         public DbSet<Usuario> Usuario { get; set; } = default!;
+        public DbSet<Doacao> Doacao { get; set; }
+        public DbSet<Projeto> Projetos { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

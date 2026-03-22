@@ -1,16 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using SeuProjeto.Models;
+using api.Data;
+using api.Models;
 
-namespace SeuProjeto.Controllers
+namespace api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class DoacaoController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public DoacaoController(AppDbContext context)
+        public DoacaoController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -19,14 +25,14 @@ namespace SeuProjeto.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Doacao>>> GetAll()
         {
-            return await _context.Doacoes.ToListAsync();
+            return await _context.Doacao.ToListAsync();
         }
 
         // GET: api/doacao/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Doacao>> GetById(int id)
         {
-            var doacao = await _context.Doacoes.FindAsync(id);
+            var doacao = await _context.Doacao.FindAsync(id);
 
             if (doacao == null)
                 return NotFound();
@@ -38,7 +44,7 @@ namespace SeuProjeto.Controllers
         [HttpPost]
         public async Task<ActionResult<Doacao>> Create(Doacao doacao)
         {
-            _context.Doacoes.Add(doacao);
+            _context.Doacao.Add(doacao);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = doacao.Id }, doacao);
@@ -59,7 +65,7 @@ namespace SeuProjeto.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Doacoes.Any(e => e.Id == id))
+                if (!_context.Doacao.Any(e => e.Id == id))
                     return NotFound();
 
                 throw;
@@ -72,12 +78,12 @@ namespace SeuProjeto.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var doacao = await _context.Doacoes.FindAsync(id);
+            var doacao = await _context.Doacao.FindAsync(id);
 
             if (doacao == null)
                 return NotFound();
 
-            _context.Doacoes.Remove(doacao);
+            _context.Doacao.Remove(doacao);
             await _context.SaveChangesAsync();
 
             return NoContent();
