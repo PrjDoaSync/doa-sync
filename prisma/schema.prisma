@@ -1,0 +1,137 @@
+// DoaSync — Prisma Schema
+// SQLite não suporta enum nativo — usando String com validação na camada de aplicação
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─────────────────────────────────────────
+// Usuario (base — herança total e disjunta conforme DER)
+// tipo: PESSOA_FISICA | PESSOA_JURIDICA | ENTIDADE | ADMIN
+// status: ATIVO | INATIVO
+// ─────────────────────────────────────────
+
+model Usuario {
+  id             String   @id @default(cuid())
+  nome           String
+  email          String   @unique
+  senha          String
+  tipo           String   // PESSOA_FISICA | PESSOA_JURIDICA | ENTIDADE | ADMIN
+  status         String   @default("ATIVO")
+  dataCadastro   DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  pessoaFisica   PessoaFisica?
+  pessoaJuridica PessoaJuridica?
+  entidade       Entidade?
+  enderecos      Endereco[]
+  telefones      Telefone[]
+
+  @@map("usuarios")
+}
+
+// ─────────────────────────────────────────
+// Especializações de Usuario (DER)
+// ─────────────────────────────────────────
+
+model PessoaFisica {
+  id             String    @id @default(cuid())
+  cpf            String    @unique
+  dataNascimento DateTime?
+  usuarioId      String    @unique
+  usuario        Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("pessoas_fisicas")
+}
+
+model PessoaJuridica {
+  id          String  @id @default(cuid())
+  cnpj        String  @unique
+  razaoSocial String
+  usuarioId   String  @unique
+  usuario     Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("pessoas_juridicas")
+}
+
+// ─────────────────────────────────────────
+// Entidade Assistencial (RF02, RF07, RF08, RF09, RF10)
+// statusAprovacao: PENDENTE | APROVADA | REPROVADA | INATIVA
+// ─────────────────────────────────────────
+
+model Entidade {
+  id               String    @id @default(cuid())
+  cnpj             String    @unique
+  razaoSocial      String
+  nomeFantasia     String?
+  descricao        String?
+  areaAtuacao      String?
+  site             String?
+  logoUrl          String?
+  statusAprovacao  String    @default("PENDENTE")
+  motivoReprovacao String?
+  dataAprovacao    DateTime?
+  aprovadoPorId    String?
+
+  emailContato     String?
+  telefoneContato  String?
+  whatsapp         String?
+
+  usuarioId        String    @unique
+  usuario          Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  endereco         EnderecoEntidade?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("entidades")
+}
+
+model EnderecoEntidade {
+  id          String   @id @default(cuid())
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  uf          String
+  cep         String
+  entidadeId  String   @unique
+  entidade    Entidade @relation(fields: [entidadeId], references: [id], onDelete: Cascade)
+
+  @@map("enderecos_entidades")
+}
+
+// ─────────────────────────────────────────
+// Endereco e Telefone (DER original)
+// ─────────────────────────────────────────
+
+model Endereco {
+  id          String  @id @default(cuid())
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  uf          String
+  cep         String
+  usuarioId   String
+  usuario     Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("enderecos")
+}
+
+model Telefone {
+  id        String  @id @default(cuid())
+  numero    String
+  tipo      String  // CELULAR | FIXO | WHATSAPP
+  usuarioId String
+  usuario   Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("telefones")
+}
