@@ -1,0 +1,9 @@
+# DoaSync
+
+## MVP — Requisitos Funcionais
+
+O MVP do DoaSync consiste em uma plataforma que permite a conexão entre doadores e entidades assistenciais, possibilitando que as entidades sejam cadastradas, aprovadas e apresentem suas informações e campanhas de arrecadação. Os doadores poderão criar uma conta, consultar entidades e campanhas disponíveis, visualizar o progresso das arrecadações e realizar doações por meio de PIX. O sistema também realizará o registro e a confirmação das doações, permitindo que os doadores consultem seu histórico e que as entidades acompanhem os valores recebidos. Para o gerenciamento da plataforma, o administrador contará com recursos para controlar usuários, entidades e campanhas, além de visualizar indicadores gerais do sistema. Dessa forma, o MVP contempla o fluxo principal do DoaSync, desde o cadastro dos usuários e entidades até a realização e acompanhamento das doações.
+
+## MVP — Requisitos Não Funcionais
+
+O MVP do DoaSync deverá oferecer uma experiência de uso simples, segura e adequada aos diferentes dispositivos, garantindo que a plataforma funcione corretamente em computadores e dispositivos móveis. O sistema deverá apresentar uma navegação objetiva, permitindo que o processo de doação seja realizado de forma simples, além de fornecer feedback sobre as ações realizadas pelos usuários. A aplicação deverá possuir desempenho adequado, segurança no armazenamento de senhas e comunicação por HTTPS, controle de acesso conforme o perfil do usuário e tratamento dos dados pessoais de acordo com a LGPD. Também deverá garantir a integridade das doações, evitando registros duplicados, registrar erros para facilitar a manutenção e possuir uma estrutura de código organizada e documentada. Esses requisitos estabelecem as condições mínimas de qualidade necessárias para o funcionamento do MVP do DoaSync.
