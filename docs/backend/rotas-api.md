@@ -804,7 +804,7 @@ Edita campanha `ATIVA`. Campos opcionais.
 
 Encerrar antes do prazo (RF13) ou desativar/reativar por violação de políticas (RF15).
 
-**Acesso:** entidade dona (somente `ENCERRADA`) ou ADMIN
+**Acesso:**2 entidade dona (somente `ENCERRADA`) ou ADMIN
 
 **Request**
 ```json
