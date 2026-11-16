@@ -1,7 +1,7 @@
 # Planejamento das Rotas Backend — DoaSync
 
 > Branch: `feat/rotas-api-v1` · Data: 07/10/2026
-> Status: **planejamento das rotas do MVP (Sprint 1)** — contrato detalhado com JSON em [`rotas-api.md`](./rotas-api.md). Implementação ainda não iniciada.
+> Status: **planejamento das rotas do MVP (Sprint 1)** — contrato detalhado com JSON em [`rotas-api.md`](./backend/rotas-api.md). Implementação ainda não iniciada.
 > Itens marcados como **[DECISÃO]** dependem de validação humana (Grupo 1 / cliente / professor).
 
 ---
@@ -18,7 +18,7 @@ Fontes analisadas para este planejamento:
 | Histórias da Equipe 4 (#53, #83–#135) | Issues `doa-sync` / `equipe-4-gestao-dashboard` | Rotas do Dashboard (prefixo `/api/v1`) |
 | Módulo de Entidades (Next.js + Prisma) | branch `cadastro-entidades` do `doa-sync` | **Referência de contrato** (rotas, envelope, códigos HTTP) |
 | Testes de API do QA (RestAssured) | `PrjDoaSync/quality` → `docs/backend/doasync-api-tests` | Contrato previsto do Dashboard |
-| DER | `doa-sync/docs/er.jpeg` | Modelo de dados |
+| DER | `doa-sync/docs/DER.png` | Modelo de dados |
 | API .NET legada (2025) | branch `dev-backend` do `doa-sync` | Referência histórica (não reaproveitada — ver §13) |
 | Frontend Next.js | branches `dev-frontend` e `cadastro-entidades` | Consumidores (telas de login, cadastro, entidades) |
 
