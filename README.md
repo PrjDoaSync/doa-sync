@@ -1,12 +1,14 @@
 # DoaSync
 
-Plataforma de gerenciamento e facilitação de doações, desenvolvida em parceria com o projeto de extensão **Amor Inclusivo**.
+Plataforma de gerenciamento e facilitação de doações.
+
+## Documentação
+
+Toda a documentação do projeto está indexada em [`docs/README.md`](./docs/README.md), com o documento canônico de cada assunto.
 
 ## Sobre o Projeto
 
 O DoaSync conecta pessoas a projetos de doação, tornando o processo de contribuir mais simples e acessível. A ideia central é reduzir a fricção entre quem quer ajudar e quem precisa, centralizando projetos, campanhas e agendamentos em um único lugar.
-
-O projeto é desenvolvido em parceria com o **Amor Inclusivo**, iniciativa de extensão universitária com foco em inclusão social e apoio a comunidades vulneráveis.
 
 ## Funcionalidades
 
@@ -29,7 +31,3 @@ A aplicação é estruturada em torno das seguintes entidades principais:
 | `Agendamento` | Marcação de data/hora para participação em um projeto |
 | `Pedido / Item Pedido` | Solicitação de produtos vinculada a um usuário |
 | `Produto` | Itens disponíveis para doação ou distribuição |
-
-## Parceria
-
-Este projeto é desenvolvido em conjunto com o **Amor Inclusivo**, projeto de extensão universitária voltado ao acolhimento e inclusão de pessoas em situação de vulnerabilidade social.

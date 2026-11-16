@@ -365,5 +365,5 @@ Fluxo de implementação TDD por prioridade:
 - [`requisitos.md`](./requisitos.md) — Requisitos funcionais (RF) e não funcionais (RNF)
 - [`rotas-api.md`](./rotas-api.md) — Contrato detalhado dos endpoints com exemplos
 - [`routes-plan.md`](./routes-plan.md) — Planejamento das rotas, decisões e problemas identificados
-- [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) — Guia visual e componentes do front-end
-- [`er.jpeg`](./er.jpeg) — Diagrama entidade-relacionamento
+- [`DESIGN-SYSTEM.md`](./frontend/DESIGN-SYSTEM.md) — Guia visual e componentes do front-end
+- [`DER.png`](./DER.png) — Diagrama entidade-relacionamento

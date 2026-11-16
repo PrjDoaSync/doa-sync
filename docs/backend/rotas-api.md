@@ -1,7 +1,7 @@
 # Contrato da API — DoaSync (`/api/v1`)
 
 > Documento de contrato das rotas backend necessárias para o MVP (Sprint 1).
-> Planejamento, justificativas e problemas encontrados: [`routes-plan.md`](./routes-plan.md).
+> Planejamento, justificativas e problemas encontrados: [`routes-plan.md`](../routes-plan.md).
 > Os exemplos usam dados fictícios. Itens marcados **[DECISÃO]** ainda dependem de validação com cliente/equipes.
 
 ## Sumário
@@ -1071,7 +1071,7 @@ Ativa ou desativa uma conta. Usuário `INATIVO` não faz login e perde o acesso 
 
 ## Rotas previstas fora do MVP (não documentadas em detalhe)
 
-Dependem de decisões ou módulos ainda inexistentes — ver §12 do [`routes-plan.md`](./routes-plan.md):
+Dependem de decisões ou módulos ainda inexistentes — ver §12 do [`routes-plan.md`](../routes-plan.md):
 
 | Rota | Origem | Bloqueio |
 |---|---|---|
