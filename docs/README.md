@@ -26,6 +26,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | [funcionalidades.md](./funcionalidades.md) | Funcionalidades organizadas por módulo | Documentação |
 | [regras-negocio.md](./regras-negocio.md) | Regras de negócio (RNxx), **fonte única das regras** | Documentação |
 | [wireframes.md](./wireframes.md) | Wireframes das telas principais | Coordenação |
+| [privacidade-lgpd.md](./privacidade-lgpd.md) | Nota de privacidade: dados coletados, finalidade, retenção e acesso | Documentação |
 
 ## Modelo de dados e arquitetura
 
