@@ -237,9 +237,7 @@ Após a conclusão do processo, o sistema deve emitir uma confirmação da doaç
 
 ### RN22 — Doação anônima
 
-O doador deve poder optar por realizar uma doação de forma anônima.
-
-Quando essa opção for utilizada, seus dados não devem ser exibidos publicamente.
+O doador autenticado pode optar por ocultar sua identidade na exibição pública e na consulta da entidade. O registro permanece associado à conta do próprio doador para histórico e rastreabilidade interna, conforme RN72, RF-020 e RNF-006. O cadastro rápido, se apresentado, deve concluir cadastro e autenticação antes do envio da doação.
 
 **Origem:** RF19
 
@@ -247,9 +245,7 @@ Quando essa opção for utilizada, seus dados não devem ser exibidos publicamen
 
 ### RN23 — Método de pagamento
 
-O sistema deve disponibilizar pelo menos um método de pagamento digital.
-
-O requisito apresenta o **PIX** como exemplo.
+O MVP aceita exclusivamente **PIX**, conforme RN70. Cartão de crédito e boleto ficam para avaliação posterior. No cenário atual descrito no [contrato da API](./backend/rotas-api.md), o registro e a confirmação de PIX são simulados até a definição do gateway.
 
 **Origem:** RF20
 
@@ -453,7 +449,10 @@ Regras levantadas ao cruzar as funcionalidades com o [mapeamento de entidades](e
 ### 8.6 Fora do escopo do MVP
 
 - **Agendamento:** a entidade AGENDAMENTO existe no modelo de dados, mas não possui funcionalidade associada no MVP (ver `routes-plan.md`). Suas regras serão definidas se o módulo for incluído em uma próxima etapa.
-- **Outros métodos de pagamento:** além do PIX, dependem de validação com o cliente (Levantamento, dúvida 1).
+- **Doação de itens físicos:** inclui a entrega na sede, a solicitação de retirada, a conferência e o controle de estoque. Se o fluxo de retirada entrar em uma próxima etapa, a proposta é solicitar endereço de coleta e telefone na etapa de logística, antes de confirmar o agendamento.
+- **Outros métodos de pagamento:** cartão de crédito e boleto dependem de validação com o cliente (Levantamento, dúvida 1).
+- **Prestação de contas e saldo residual:** proposta para pós-MVP. O encerramento de campanha segue RF-013. Para a futura publicação da prestação de contas, propõe-se exigir a destinação documentada do saldo positivo e sua aprovação conforme política definida pelo cliente.
+- **Categorias de campanhas:** proposta para pós-MVP. A adoção depende de taxonomia aprovada e atualização do modelo de dados e do contrato da API. Os filtros do RF-017 são entidade e status.
 
 ---
 
@@ -475,6 +474,9 @@ Os seguintes pontos não estão completamente definidos nos requisitos atuais e 
 | RN44 | Idade mínima de 18 anos para o doador? | 🟡 Proposta adotada — confirmar |
 | RN54 | Reprovação com motivo e possibilidade de reenvio do cadastro? | 🟡 Proposta adotada — confirmar |
 | RN56 | Quais dados aparecem no perfil público da entidade? | 🟡 Proposta adotada — confirmar |
+| DOC-05 / QA-04 | Como coletar contato e endereço se a retirada de itens entrar no escopo? | Proposta para pós-MVP: etapa de logística antes da confirmação |
+| DOC-05 / QA-05 | Quem aprova e quais destinos são admitidos para o saldo residual? | Validar política com o cliente antes de habilitar a publicação de prestação de contas |
+| DOC-05 / QA-06 | Quais categorias devem existir e quem as mantém? | Validar antes de alterar o modelo e o contrato da API |
 
 ---
 

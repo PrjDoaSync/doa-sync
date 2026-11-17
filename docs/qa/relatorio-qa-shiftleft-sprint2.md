@@ -431,6 +431,20 @@ Para evitar que os desenvolvedores criem soluções arbitrárias, o Grupo 1 deve
 5. **Critério de Sobra de Caixa na Prestação de Contas:** Em campanhas com arrecadação financeira excedente (arrecadado > aplicado), qual é a regra de destinação do saldo residual para permitir a publicação da prestação de contas?
 6. **Mapeamento de Categorias no Backend:** O modelo de dados da entidade `Campanha` será alterado para receber o campo `categoria` presente nos filtros do protótipo?
 
+
+#### Respostas da Equipe 1 — Sprint 3
+
+Registro de proposta para revisão nos cards [DOC-04 #183](https://github.com/PrjDoaSync/doa-sync/issues/183) e [DOC-05 #184](https://github.com/PrjDoaSync/doa-sync/issues/184). As referências canônicas são [escopo do MVP](../definicao-mvp.md), [requisitos](../requisitos.md) e [regras de negócio](../regras-negocio.md). Aprovação do professor/cliente pendente.
+
+| Pergunta | Resposta proposta | Critério para o QA neste ciclo |
+|---|---|---|
+| 1. Itens físicos e estoque | Fora do MVP. As telas de doação de itens, conferência e estoque representam visão futura. | Cobrir o fluxo financeiro por PIX. Retirar cenários de itens e estoque do aceite do MVP. |
+| 2. Checkout anônimo ou cadastro rápido | Conta e autenticação são obrigatórias (RF-020). Cadastro rápido, se exibido, deve resultar em conta autenticada. O anonimato restringe a exposição da identidade e preserva o vínculo interno (RN22, RN72, RNF-006). | Sem sessão, o checkout direciona ao login/cadastro. Com sessão e opção anônima, a doação aparece no histórico do doador e a entidade recebe `doador: null` e vê “Doador anônimo” na interface. |
+| 3. Cartão, boleto e PIX | PIX é o único meio do MVP (RN23, RN70). O contrato atual descreve confirmação simulada enquanto o gateway estiver indefinido. | Cobrir a opção PIX e o retorno simulado. Pagamento real, expiração bancária e webhook dependem da integração. Cartão e boleto ficam fora do aceite. |
+| 4. Retirada de itens | Fora do MVP. Para uma futura inclusão, propõe-se coletar endereço e telefone na etapa de logística, antes de confirmar a retirada. | Nenhuma etapa de endereço de coleta é exigida no checkout PIX. |
+| 5. Sobra de caixa | A publicação de prestação de contas fica proposta para pós-MVP. Se a funcionalidade entrar no escopo, propõe-se exigir a destinação documentada do saldo positivo antes da publicação. Destinos permitidos e autoridade de aprovação precisam de definição pelo cliente. | Validar encerramento e bloqueio de novas doações (RF-013). A existência de saldo residual não condiciona o encerramento no MVP. |
+| 6. Categorias | O campo `categoria` fica proposto para pós-MVP. A inclusão depende de taxonomia acordada e atualização do modelo, API e UI. | Testar os filtros por entidade e status (RF-017). A API do MVP não exige nem usa categoria para filtrar campanhas. |
+
 ---
 
 ### 5.2 Sugestões de Novos Critérios de Aceite no Padrão BDD (Gherkin)
