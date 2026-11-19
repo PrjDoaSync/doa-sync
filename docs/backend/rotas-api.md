@@ -1,6 +1,8 @@
 # Contrato da API — DoaSync (`/api/v1`)
 
-> Documento de contrato das rotas backend necessárias para o MVP (Sprint 1).
+> ⚠️ **Este arquivo está sendo mantido como referência histórica.**
+> O contrato consolidado e atualizado, com status de implementação por rota, está em **[`contrato-api.md`](./contrato-api.md)** (Task DOC-09 #188).
+>
 > Planejamento, justificativas e problemas encontrados: [`routes-plan.md`](../routes-plan.md).
 > Os exemplos usam dados fictícios. Itens marcados **[DECISÃO]** ainda dependem de validação com cliente/equipes.
 
