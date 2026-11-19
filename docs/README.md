@@ -40,7 +40,8 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 
 | Documento | Assunto | Dono | Origem |
 |---|---|---|---|
-| [backend/rotas-api.md](./backend/rotas-api.md) | Contrato da API: requisição e resposta (JSON) de cada rota | Back | — |
+| [backend/contrato-api.md](./backend/contrato-api.md) | **Contrato consolidado da API** — 22 rotas com método, path, perfil de acesso, request, response, erros e status (✅ implementada / 🔧 planejada) | Back | — |
+| [backend/rotas-api.md](./backend/rotas-api.md) | Contrato da API: requisição e resposta (JSON) de cada rota — referência histórica; ver `contrato-api.md` | Back | — |
 | [routes-plan.md](./routes-plan.md) | Planejamento da API: decisões, dependências, ordem de implementação e problemas encontrados | Back | — |
 | [backend/pipeline-ci-cd.md](./backend/pipeline-ci-cd.md) | Guia de pipeline CI/CD do backend | Back | — |
 | [backend/cenarios-testes-api.md](./backend/cenarios-testes-api.md) | Cenários de teste da API | QA | `quality` |
