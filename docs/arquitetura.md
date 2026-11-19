@@ -3,6 +3,8 @@
 > **Task 150 — Definição da Arquitetura da Aplicação**
 > Responsável: Grupo 5 — Qualidade de Software
 > Semestre: 2026/2
+>
+> **Atualização — Task DOC-08 (#187):** diagrama e tabelas corrigidos para refletir a implementação real. Frontend atualizado de React + Next.js para **React + Vite** (SPA); API Express no `doasync-backend` registrada como componente com situação a definir junto à Equipe 2.
 
 ---
 
@@ -14,18 +16,22 @@ O DoaSync é uma plataforma web de arrecadação de doações que conecta doador
 ┌─────────────────────────────────────────────────────────────┐
 │                        CLIENTES                             │
 │                                                             │
-│   ┌──────────────────────┐   ┌──────────────────────────┐   │
-│   │  Web (React + Next)  │   │  Mobile (React Native)   │   │
-│   │  Tailwind CSS        │   │  Expo                    │   │
-│   └──────────┬───────────┘   └──────────────┬───────────┘   │
-└──────────────│──────────────────────────────│───────────────┘
-               │  HTTPS / REST (JSON)         │
-               ▼                              ▼
+│   ┌───────────────────────────────────────────────────┐     │
+│   │  Web (React 19 + Vite 8)                          │     │
+│   │  React Router 7 · Axios · CSS próprio             │     │
+│   │  Integração com backend: pendente (DemoProvider)  │     │
+│   └──────────────────────────┬────────────────────────┘     │
+└─────────────────────────────-│──────────────────────────────┘
+                               │  HTTPS / REST (JSON)
+                               │  VITE_API_URL → :8080/api
+                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                  BACK-END (Spring Boot 4.1.1)                │
-│                  Java 17 · Maven · /api/v1                   │
+│              BACK-END — doasync-backend (privado)           │
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐   │
+│  │  API Spring Boot 4.1.1  (backend oficial)            │   │
+│  │  Java 17 · Maven · /api/v1                           │   │
+│  │                                                      │   │
 │  │  Spring Security (JWT HS256 · Stateless)             │   │
 │  ├──────────┬──────────┬──────────┬──────────┬──────────┤   │
 │  │ usuario  │ entidade │ campanha │  doacao  │dashboard │   │
@@ -33,14 +39,20 @@ O DoaSync é uma plataforma web de arrecadação de doações que conecta doador
 │  ├──────────┴──────────┴──────────┴──────────┴──────────┤   │
 │  │           shared (envelope · erros · paginação)      │   │
 │  └──────────────────────────┬───────────────────────────┘   │
+│                             │  JPA / Hibernate               │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  API Express (Node.js) — situação a definir          │   │
+│  │  Papel: provisório · paralelo · ou descontinuado?    │   │
+│  │  ⚠ Decisão pendente com Equipe 2 (PV-Express)       │   │
+│  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────│───────────────────────────────┘
-                              │  JPA / Hibernate
+                              │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                       BANCO DE DADOS                        │
 │                                                             │
 │  PostgreSQL (produção / homologação)                        │
-│  H2 in-memory (desenvolvimento e testes)                    │
+│  H2 in-memory (desenvolvimento e testes — Spring Boot)      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -50,16 +62,24 @@ O DoaSync é uma plataforma web de arrecadação de doações que conecta doador
 
 ### 2.1 Front-end
 
-| Aspecto | Tecnologia |
-|---|---|
-| Framework Web | React + Next.js |
-| Framework Mobile | React Native / Expo |
-| Estilização | Tailwind CSS |
-| Ícones | Phosphor Icons |
-| Tipografia | Inter (Google Fonts) |
-| Acessibilidade | WCAG 2.1 nível AA |
+> Repositório: [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) · branch `develop` · código em `web/`
+> Versões conferidas em `web/package.json` (branch `develop`).
 
-O front-end **não acessa o banco diretamente**; todos os dados chegam via chamadas à API REST do back-end (RNF-017).
+| Aspecto | Tecnologia | Versão |
+|---|---|---|
+| Linguagem | JavaScript / JSX | Node.js 24 requerido |
+| Framework Web | React | ^19.3.1 |
+| Bundler / dev server | Vite + `@vitejs/plugin-react` | ^8.3.4 / ^6.1.2 |
+| Roteamento | React Router DOM | ^7.18.4 |
+| HTTP client | Axios | ^1.20.0 |
+| Estilização | CSS próprio (`index.css`) | — |
+| Lint | oxlint | ^1.88.0 |
+| Testes | Vitest + React Testing Library + jsdom | ^5.0.5 / ^16.3.3 / ^29.1.1 |
+| Design e prototipagem | Figma | — |
+
+O front-end **não acessa o banco diretamente**; todos os dados chegam via chamadas à API REST do back-end (RNF-017). A integração com a API Spring Boot (`VITE_API_URL=http://localhost:8080/api`) está declarada nos services Axios, mas ainda **não foi ativada** — o frontend opera com um `DemoProvider` em memória.
+
+> **Nota:** TypeScript, Next.js (SSR/SSG), Tailwind CSS, React Native e Expo estavam no plano original mas **não estão no repositório atual** (branch `develop`). O escopo mobile permanece planejado, sem implementação neste repositório.
 
 ### 2.2 Back-end
 
@@ -103,7 +123,19 @@ Controller (HTTP · DTO · validação)
  Entidade de domínio (regras de estado encapsuladas na própria entidade)
 ```
 
-### 2.3 Banco de Dados
+### 2.3 API Express (Node.js) — situação a definir
+
+O repositório `doasync-backend` contém, além da API Spring Boot, uma **API Express (Node.js)**. A relação entre as duas está pendente de alinhamento com a **Equipe 2 (backend de campanhas)**:
+
+| Hipótese | Descrição |
+|---|---|
+| **Provisória** | A API Express foi criada como ponte enquanto a API Spring Boot não estava funcional; será descontinuada quando o Spring Boot cobrir todos os endpoints necessários |
+| **Paralela** | A API Express é responsável por um subconjunto específico de rotas (ex.: campanhas da Equipe 2) e convive com o Spring Boot |
+| **Descontinuada** | A API Express não está mais em uso ativo e pode ser removida |
+
+> **Decisão pendente PV-Express:** a Equipe 2 deve registrar a decisão nesta seção e em [`stack.md`](./stack.md) §6. Enquanto não há decisão, a API Spring Boot (`/api/v1`) é a referência oficial para contratos, testes do QA e integração com o frontend.
+
+### 2.4 Banco de Dados
 
 O modelo de dados central gira em torno das seguintes entidades:
 
@@ -353,10 +385,14 @@ Fluxo de implementação TDD por prioridade:
 - [x] Ambientes separados (dev, homologação, produção) (RNF-025)
 - [x] CI/CD com build, lint e testes automáticos por PR (RNF-024)
 - [x] Suporte a múltiplas entidades por configuração, sem mudança de código (RNF-027)
+- [x] **DOC-08:** Diagrama e tabelas atualizados para a stack real (React + Vite, sem Next.js/Tailwind/Mobile)
+- [x] **DOC-08:** API Express registrada como componente com decisão pendente (PV-Express, Equipe 2)
+- [ ] Decisão sobre API Express registrada com Equipe 2 (PV-Express)
 - [ ] Flyway/Liquibase para migração de schema
 - [ ] Gateway de pagamento definido (PV01)
 - [ ] Deploy automático configurado (RNF-026)
 - [ ] Backup automático do banco de produção (RNF-030)
+- [ ] Integração frontend ↔ API Spring Boot ativada (substituir DemoProvider)
 
 ---
 
