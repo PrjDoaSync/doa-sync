@@ -36,6 +36,12 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | [arquitetura.md](./arquitetura.md) | Arquitetura da aplicação | Back |
 | [stack.md](./stack.md) | Stack tecnológica e justificativas | Back |
 
+## Guias de execução
+
+| Documento | Assunto | Dono |
+|---|---|---|
+| [guia-instalacao-execucao-local.md](./guia-instalacao-execucao-local.md) | Instalar e executar back-end e front-end localmente | Documentação |
+
 ## Backend
 
 | Documento | Assunto | Dono | Origem |
