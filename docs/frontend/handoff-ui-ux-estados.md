@@ -248,3 +248,176 @@ Contrato documentado em [`rotas-api.md`](../backend/rotas-api.md):
 | 422 e alguns 409 | `{ "erros": { "campo": "mensagem" } }` |
 
 Para a tabela acima funcionar, `normalizeError` precisa ler `data.error` e `data.erros`, além de `data.message`. Isso é a pendência D-03.
+
+---
+
+## 7. Estados por tela
+
+### 7.1 O que o código já trata (Implementado)
+
+Mensagens de vazio e de "não encontrado" verificadas no `doasync-frontend`. Use estes textos como padrão e não crie variações.
+
+| Rota | Situação | Texto no código |
+|---|---|---|
+| `*` (rota inexistente) | Página não encontrada | "Página não encontrada" + link "Voltar ao início" |
+| `/` e `/explorar` (listagens públicas) | Sem resultado | "Nenhum resultado encontrado" / "Experimente alterar os filtros para encontrar o que procura." |
+| `/campanhas/:id` | Campanha inexistente | "Campanha não encontrada" |
+| `/campanhas/:id` (aba de atualizações) | Sem atualizações | "Nenhuma atualização publicada" |
+| `/campanhas` | Sem campanhas | "Nenhuma campanha encontrada." (com loading e erro por `RequestState`) |
+| `/campanhas/:id/editar`, `/acompanhamento`, `/prestacao-de-contas` | Campanha inexistente | "Campanha não encontrada" / "Verifique o endereço ou volte para a lista de campanhas." |
+| `/campanhas/:id/acompanhamento` | Sem doações confirmadas | "Nenhuma doação confirmada ainda." |
+| `/campanhas/:id/prestacao-de-contas` | Sem despesas | "Nenhuma despesa registrada ainda." |
+| `/doar/:id` | Campanha sem condição de receber doação | "Campanha indisponível para doação" |
+| `/doar/:id/confirmacao/:doacaoId` e `/minhas-doacoes/:doacaoId` | Doação inexistente | "Doação não encontrada" / "Verifique o endereço ou volte para suas doações." |
+| `/minhas-doacoes` | Doador sem doações | "Você ainda não fez nenhuma doação" / "Explore as campanhas e apoie uma causa." |
+| `/minhas-doacoes` | Filtro sem resultado | "Nenhuma doação encontrada com esses filtros." |
+| `/dashboard/campanha` | Campanha inexistente | "Campanha não encontrada" |
+| `/doacoes` | Sem doações (com loading e erro por `RequestState`) | "Nenhuma doação encontrada." |
+| `/doadores` | Sem doadores | Texto padrão do componente `Vazio` |
+| `/relatorios` | Filtro sem resultado | "Nenhum registro para os filtros selecionados." |
+| `/entidades` | Sem entidades (com loading e erro por `RequestState`) | "Nenhuma entidade encontrada." |
+
+Também implementado, segundo o registro de fechamento do front: falha de leitura ou decodificação de imagem (mostra erro e preserva os dados anteriores; JPG, PNG ou WebP, até 2 MB por arquivo e 3 fotos de galeria); doação **pendente** nunca é mostrada como dinheiro recebido; diálogos nomeados; região de tabela focável por teclado e com nome.
+
+### 7.2 O que precisa ser implementado (Proposta)
+
+Tudo abaixo é **Proposta**, pendente de validação do Produto/UX. Os textos de erro de HTTP estão na seção 6.
+
+| Grupo | Telas | Especificação |
+|---|---|---|
+| Listagens públicas e de gestão | CAM01, CAM02, CAM07, GES05, GES06, GES08 | **Loading:** skeleton de 3 cards ou 5 linhas, com a mesma altura do conteúdo final. **Erro:** `ErrorMessage` no lugar da lista, mantendo cabeçalho e filtros. **Vazio por filtro:** além do texto atual, botão "Limpar filtros". **Paginação:** em "carregar mais", spinner no rodapé e, se falhar, "Não foi possível carregar mais" com "Tentar novamente", sem perder os itens já mostrados (RNF-028) |
+| Detalhe de campanha | CAM03 | Campanha **encerrada** ou **desativada**: botão de doar desabilitado, com o motivo em texto ("Esta campanha foi encerrada e não aceita novas doações.", RF-013). Visitante sem login que clica em doar vai ao login e volta à campanha (RF-020) |
+| Criação e edição de campanha | CAM04, CAM05, CAM06, CAM08 | Botão "Publicando..." desabilitado durante o envio. Erros de campo conforme 6 (422). Ao sair com dados preenchidos, modal "Descartar alterações?" com "Continuar editando" e "Descartar". Limites sugeridos pelo QA §4.1: título de 10 a 80 caracteres, descrição de 50 a 2.000 |
+| Acompanhamento e encerramento | CAM09, CAM10 | Falha em um indicador não derruba a tela: mostrar "—" no card, com "Tentar novamente". Encerrar campanha exige modal de confirmação (ação sem volta) |
+| Fluxo de doação | DOA01 a DOA07 | "Continuar" desabilitado até haver dado válido, com o motivo em texto. **Bloquear duplo clique** no envio (RNF-008): usar `useAsyncAction`. Valor: vazio, zero ou negativo viram erro de campo. Itens: rejeitar negativos e decimais, com máximo de 999 por transação (QA §4.1). PIX: timeout de 10 s com "Instabilidade no serviço de pagamentos." e "Tentar novamente". Enquanto o pagamento for simulado (PV01), manter o aviso de demonstração |
+| Confirmação | DOA08 | Tela dedicada, com foco movido para o título. Doação **pendente** não usa texto de sucesso (RF-022). Recarregar a página não duplica a doação: a tela é carregada pelo id |
+| Histórico e detalhe | DOA09, DOA10 | Skeleton de 5 linhas. Erro com "Tentar novamente". Em telas estreitas, tabela vira lista de cards |
+| Login e cadastro | GES01, GES02 | Login: 401 com "E-mail ou senha inválidos." **sem indicar qual campo está errado** (RF-002). Recuperação de senha: resposta neutra ("Se este e-mail estiver cadastrado, enviaremos um link de recuperação."), sem revelar quais e-mails existem. Depende de PV05. Cadastro de entidade: ao concluir, mostrar que a entidade está **em análise** (nasce `PENDENTE`) |
+| Dashboards | GES03, GES04 | **Zero é dado válido:** mostrar "0" e "R$ 0,00", sem tratar como vazio. Erro por indicador. Skeleton por card |
+| Controle de itens e relatórios | GES07, GES08 | Exportação: botão em loading e erro explícito. Enquanto não houver gerador de arquivo, manter o aviso de que a exportação não gera arquivo |
+| Usuários e perfil | GES09, GES10 | Mudança de papel e desativação exigem modal. O administrador não pode desativar a si mesmo, com o motivo em texto. "Salvar" em loading e "Descartar" disponível |
+
+---
+
+## 8. Responsividade e acessibilidade
+
+### 8.1 Breakpoints
+
+| Fonte | Valor |
+|---|---|
+| Frames do Figma | Desktop de **1440 px**. Não há frame mobile (390 px) identificado (D-02) |
+| Design System | Mobile até 767 px, tablet de 768 a 1023 px, desktop a partir de 1024 px |
+| CSS do front (`@media (max-width)`) | 540, 760, 800, 900, 1000, 1024, 1100 e 1280 px |
+| Padding do conteúdo administrativo | 40 px no desktop; 24 px em 768 e 1024 px; 20 px e 16 px em 320 px |
+| Título de página | 28 px no desktop; 22 px em 320 px |
+
+> **Estado da validação.** O front registra que a validação visual **mobile não foi aprovada** (a inspeção real cobriu 1280 px) e que a matriz em 320, 768, 1024 e 1440 px continua pendente. As regras responsivas existem no CSS, mas não foram conferidas em tela pequena. Pendência D-09.
+
+| Elemento de estado | Mobile | Desktop |
+|---|---|---|
+| Skeleton de cards | 1 coluna | 3 colunas |
+| Toast | Parte inferior, com margens | Canto da tela |
+| Tabelas | Rolam **dentro** da região, com acesso por teclado, ou viram cards | Tabela |
+| Botão principal | Área de toque mínima de 44 × 44 px | Altura padrão |
+| Bloco de erro ou vazio | Padding de 24 px, botão com largura total | Centralizado |
+
+### 8.2 Acessibilidade dos estados (RNF-012)
+
+| Item | Situação | Regra |
+|---|---|---|
+| Link "Pular para o conteúdo" e `main#conteudo` | Implementado | Manter em todos os layouts |
+| Foco visível (`:focus-visible`) | Implementado | Nunca remover sem substituto |
+| Rótulo de campo | Implementado: o `Campo` envolve controle e `label`, e liga a ajuda por `aria-describedby` | Placeholder não substitui rótulo |
+| Loading, erro e sucesso anunciados | Implementado: `role="status"` e `role="alert"` | Manter |
+| Diálogo com `Escape` | Implementado (`<dialog>` nativo) | Manter |
+| Barra de progresso | Implementado (`role="progressbar"`) | Mostrar também o valor em texto |
+| Status só por cor | Implementado: `StatusBadge` e `Aviso` trazem texto ou ícone | Nunca usar só cor |
+| Movimento reduzido | Existe regra para `prefers-reduced-motion` | Aplicar também ao skeleton e ao spinner quando existirem |
+| Erro de campo | Proposta | `aria-invalid="true"` e `aria-describedby` apontando para a mensagem. Foco no primeiro campo inválido |
+| Foco após sucesso de fluxo | Proposta | Mover o foco para o título da tela de confirmação |
+| Toast de erro | Proposta | `role="alert"`, com botão de fechar e **sem fechamento automático** (o texto pode não ser lido a tempo) |
+| Botão desabilitado | Proposta | Mostrar o motivo em texto próximo, pois ele não recebe foco |
+| Fluxo de doação por teclado | A validar | Deve ser concluível só com teclado (RNF-012) |
+
+---
+
+## 9. Catálogo de mensagens
+
+Tom: direto, acolhedor, sem jargão técnico e sem culpar o usuário (RNF-011). Frases curtas.
+
+| Situação | Texto | Origem |
+|---|---|---|
+| Carregando | "Carregando..." | Implementado |
+| Tentar de novo | "Tentar novamente" | Implementado |
+| Erro genérico | "Ocorreu um erro inesperado." | Implementado |
+| Sem conexão com o servidor | "Não foi possível conectar ao servidor." | Implementado |
+| Tempo esgotado | "Tempo de resposta esgotado." | Implementado |
+| Rota inexistente | "Página não encontrada" | Implementado |
+| Voltar | "Voltar ao início" | Implementado |
+| Fechar aviso | "Dispensar aviso" | Implementado |
+| Sessão expirada | "Sua sessão expirou. Faça login novamente." | QA §4.2 |
+| Sem permissão | "Você não tem permissão para acessar esta página." | Proposta |
+| Offline | "Você está offline. Suas alterações foram salvas localmente." | QA §4.2 |
+| Falha no servidor | "Desculpe, ocorreu uma instabilidade em nossos servidores. Nossa equipe já foi notificada." | QA §4.2 |
+| Campanha encerrada | "Esta campanha foi encerrada e não aceita novas doações." | QA §4.2 |
+| Duplicidade | "CNPJ já cadastrado." | QA §4.2 |
+| Pagamento instável | "Instabilidade no serviço de pagamentos." | QA §4.2 |
+| Campo obrigatório | "Informe <nome do campo>" | Proposta |
+| Salvo com sucesso | "Alterações salvas" | Proposta |
+| Ação irreversível | "Esta ação não pode ser desfeita." | Proposta |
+
+---
+
+## 10. Diferenças conhecidas e pendências
+
+| ID | Pendência | Responsável sugerido | Bloqueia |
+|---|---|---|---|
+| D-01 | Confirmar o **arquivo oficial do Figma** (`3eBaQzgx…` ou `JaIKR7tT…`), confirmar que os links abrem e padronizar os documentos | Produto/UX | Seção 3 |
+| D-02 | Identificar ou criar os **frames mobile** (390 px) e registrar os links | Produto/UX | Critério da issue #72 |
+| D-03 | Ajustar `normalizeError` (ou o contrato) para o front ler `error` e `erros`, e não só `message` | Front-end e Back-end | Seção 6 |
+| D-04 | Tratar **401** (redirecionar ao login) e **403** (tela de acesso negado) de forma central | Front-end | Seção 6 |
+| D-05 | `Toast` não fecha sozinho, e o Design System define 4 s. Decidir qual vale | UX | DS §7.8 |
+| D-06 | Implementar **skeleton**, spinner em botão, aviso offline e usar `useAsyncAction` nos envios | Front-end | Seção 5.2 |
+| D-07 | Decidir a **fonte de verdade dos tokens**. O Design System cita Tailwind e Phosphor, mas o código usa CSS próprio e ícones SVG. As cores de feedback, o texto secundário, a borda, o título (28 × 32 px) e o peso do botão (600 × 500) diferem | Produto/UX e Front-end | Seção 4 |
+| D-08 | `color.text.muted` (`#94A3B8`) tem contraste de 2,56:1 e não pode ser usado em texto | UX | RNF-012 |
+| D-09 | Fazer a validação visual em 320, 768, 1024 e 1440 px e registrar em [`frontend-validacao.md`](./frontend-validacao.md), que ainda está todo como "Pendente" | QA e Front-end | Seção 8 |
+| D-10 | Decisões **PV01** (pagamento real) e **PV05** (e-mail de recuperação) | Gestão | Telas DOA04, DOA05, GES01 |
+| D-11 | **Repasse técnico** aos desenvolvedores e **aceite da liderança técnica** (critérios da issue #72). Não foram realizados | Documentação e liderança | Encerramento da #72 |
+| D-12 | O texto "Nossa equipe já foi notificada" depende de existir monitoramento de erros | Back-end | Mensagem do 500 |
+
+---
+
+## 11. Atendimento aos critérios da issue
+
+| Critério (issue #191) | Onde | Situação |
+|---|---|---|
+| `DESIGN-SYSTEM.md` com tokens, componentes e estados | Tokens e componentes já existiam. Os **estados** estão na nova seção 7.9 do [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md). A correspondência com o projeto está na seção 4 deste documento | Atendido |
+| Mensagens padrão por código HTTP (401, 403, 404, 409, 422, 500) | Seção 6 | Atendido. Falta implementar no front (D-03, D-04) |
+| Links para as telas no Figma | Seção 3: 30 frames desktop | Parcial. Frames mobile e arquivo oficial pendentes (D-01, D-02). Os endereços respondem HTTP 200, mas o acesso ao conteúdo exige login e **não foi verificado** |
+| Objetivo: cobrir os estados pedidos no relatório de QA §4.2 e §4.3 | Seções 5, 6, 7 e 8 | Atendido |
+
+---
+
+## 12. Checklist de handoff por tela
+
+Marcar na entrega de cada tela pelo front-end e na revisão do QA.
+
+- [ ] Estado de **loading** implementado (skeleton ou spinner de botão), sem salto de layout
+- [ ] Estado **vazio** implementado, com diferença entre vazio absoluto e vazio por filtro
+- [ ] Estado de **erro** implementado para campo, formulário e carga
+- [ ] Erros HTTP 401, 403, 404, 409, 422 e 500 tratados conforme a seção 6
+- [ ] Botões de envio com `disabled` e indicador de carga, sem envio duplicado
+- [ ] Nenhum `alert()` do navegador e nenhuma mensagem técnica exibida (RNF-011)
+- [ ] Campos com rótulo, `aria-invalid` e `aria-describedby` quando em erro
+- [ ] Foco visível e fluxo completo por teclado
+- [ ] Contraste mínimo de 4,5:1 em texto e 3:1 em texto grande
+- [ ] Layout validado em 320, 768, 1024 e 1440 px
+- [ ] Textos conferidos com a seção 9
+- [ ] Link do frame do Figma conferido com a tela implementada
+- [ ] Evidência (captura de tela ou PR) registrada em [`frontend-validacao.md`](./frontend-validacao.md)
+
+---
+
+## 13. Manutenção
+
+Atualize este documento quando: uma tela for ligada à API (rever a seção 7.1), `tokens.css` mudar, o Design System definir os estados hoje marcados como proposta, o formato de erro da API mudar (D-03), ou os frames do Figma forem atualizados ou reorganizados. Não registre como implementado o que não foi verificado no código do `doasync-frontend`.
