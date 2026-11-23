@@ -7,7 +7,7 @@
 
 ## 1. Visão Geral
 
-Este documento registra as tecnologias, frameworks, ferramentas e serviços escolhidos para o desenvolvimento do MVP do DoaSync, com as respectivas justificativas. As decisões aqui documentadas estão alinhadas com os requisitos não funcionais levantados (RNF-001 a RNF-030) e com os documentos [`arquitetura.md`](./arquitetura.md) e [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md).
+Este documento registra as tecnologias, frameworks, ferramentas e serviços escolhidos para o desenvolvimento do MVP do DoaSync, com as respectivas justificativas. As decisões aqui documentadas estão alinhadas com os requisitos não funcionais levantados (RNF-001 a RNF-030) e com os documentos [`arquitetura.md`](./arquitetura.md) e [`DESIGN-SYSTEM.md`](./frontend/DESIGN-SYSTEM.md).
 
 ---
 
@@ -59,10 +59,10 @@ Este documento registra as tecnologias, frameworks, ferramentas e serviços esco
 - **TypeScript:** tipagem estática reduz erros em tempo de desenvolvimento e melhora a manutenibilidade em projetos com múltiplos colaboradores.
 - **React + Next.js (App Router):** React é dominante no mercado e familiar à equipe; Next.js adiciona renderização híbrida (SSR/SSG), roteamento e otimizações de imagem nativos, melhorando desempenho e SEO das campanhas públicas.
 - **React Native + Expo:** reutiliza a familiaridade com React para o desenvolvimento mobile, e o Expo acelera a configuração inicial e o build para iOS/Android sem necessidade de ferramentas nativas complexas.
-- **Tailwind CSS:** sistema de utilitários de CSS que implementa diretamente os design tokens do projeto (espaçamento, cores, tipografia) sem CSS arbitrário, mantendo consistência visual entre os times (RNF-012, RNF-014). É a fonte de verdade de medidas do [Design System](./DESIGN-SYSTEM.md).
+- **Tailwind CSS:** sistema de utilitários de CSS que implementa diretamente os design tokens do projeto (espaçamento, cores, tipografia) sem CSS arbitrário, mantendo consistência visual entre os times (RNF-012, RNF-014). É a fonte de verdade de medidas do [Design System](./frontend/DESIGN-SYSTEM.md).
 - **Phosphor Icons:** biblioteca de ícones com variantes consistentes e suporte nativo para React e React Native, evitando dependências paralelas para web e mobile.
 - **Inter:** tipografia humanista de alta legibilidade, adequada para dashboards de dados e interfaces de doação (RNF-010, RNF-012).
-- **Figma:** ferramenta de design colaborativo para criação dos protótipos e do Design System visual, referenciada em [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md).
+- **Figma:** ferramenta de design colaborativo para criação dos protótipos e do Design System visual, referenciada em [`DESIGN-SYSTEM.md`](./frontend/DESIGN-SYSTEM.md).
 
 ---
 
@@ -162,6 +162,6 @@ Este documento registra as tecnologias, frameworks, ferramentas e serviços esco
 ## Referências
 
 - [`arquitetura.md`](./arquitetura.md) — Arquitetura da aplicação (diagramas, camadas, fluxos, segurança)
-- [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) — Guia visual, tokens e componentes do frontend
+- [`DESIGN-SYSTEM.md`](./frontend/DESIGN-SYSTEM.md) — Guia visual, tokens e componentes do frontend
 - [`requisitos.md`](./requisitos.md) — Requisitos funcionais (RF) e não funcionais (RNF)
 - [`rotas-api.md`](./rotas-api.md) — Contrato detalhado dos endpoints REST
