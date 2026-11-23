@@ -356,3 +356,140 @@ Doação financeira de um usuário a uma entidade, com ou sem campanha (RN66, RN
 | V6 | `V6__status_campanha_rascunho.sql` | Inclui o status `RASCUNHO` em `campanhas` |
 
 As migrações V1 a V4 são imutáveis: mudanças no schema entram sempre em uma migração nova.
+
+---
+
+## 4. Resumo do modelo atual
+
+O modelo atual tem 8 tabelas de negócio organizadas em três blocos:
+
+| Bloco | Tabelas | Função |
+|---|---|---|
+| Identidade | `usuarios`, `pessoas_fisicas`, `pessoas_juridicas`, `telefones`, `enderecos` | Quem usa a plataforma e como contatá-lo |
+| Entidades assistenciais | `entidades` | Perfil institucional e aprovação do cadastro |
+| Arrecadação | `campanhas`, `doacoes` | Campanhas das entidades e doações recebidas |
+
+---
+
+## 5. Divergências entre as modelagens e o banco real
+
+Esta seção responde ao critério da issue: *"divergências entre a modelagem original e o banco real listadas"*. Em cada tabela, a coluna **Banco real** é a referência, porque é o que está implementado.
+
+### 5.1 `DER.png` oficial × banco real
+
+O `DER.png` é o desenho vigente do modelo. Quase tudo bate com as migrações. As diferenças são:
+
+| # | Item | `DER.png` | Banco real (V1 a V6) | Ação sugerida |
+|---|---|---|---|---|
+| 1 | `entidades.aprovado_por_id` | Existe: FK para o usuário ADMIN que aprovou, opcional | **Não existe** | Decidir: criar migração nova ou remover do DER |
+| 2 | `doacoes.doador_id` | FK para `pessoas_fisicas.usuario_id` (só PF doa) | FK para `usuarios(id)`: **qualquer tipo de usuário** é aceito pelo banco | Alinhar. Se só PF e PJ doam, a restrição fica no serviço |
+| 3 | `campanhas.status` | `AGENDADA`, `ATIVA`, `ENCERRADA`, `DESATIVADA` | Inclui também **`RASCUNHO`** (migração V6) | Atualizar o DER |
+| 4 | Colunas `versao` | Não aparecem | Existem em `usuarios`, `entidades`, `campanhas` e `doacoes` | Atualizar o DER |
+| 5 | `tipo_usuario` | Não aparece | Existe em `pessoas_fisicas`, `pessoas_juridicas` e `entidades` (base das FKs compostas) | Atualizar o DER |
+| 6 | Colunas de origem do projeto antigo | Não aparecem | `campanhas.categoria`, `projeto_legado_id`, `usuario_criador_legado_id`, `data_projeto_legado` (migração V4) | Atualizar o DER |
+| 7 | Regras escritas na legenda do DER | "mínimo 18 anos" (`data_nascimento`), "`data_inicio` não pode estar no passado", "endereço obrigatório para entidade, opcional para doador" | **Nenhuma** dessas regras tem `CHECK` ou constraint no banco | Confirmar se o serviço as valida. Não foi verificado neste documento |
+| 8 | Legenda de `usuarios.tipo` | A imagem mostra o texto cortado (`PESSOA_FISICA \| ENTIDADE \| ADMIN…`) | 4 valores, incluindo `PESSOA_JURIDICA` | Refazer a exportação da imagem sem corte |
+
+### 5.2 Modelagem conceitual original (#15) × banco real
+
+Fonte: imagem de modelagem conceitual (modelo entidade-relacionamento) da branch `branch#diagrama-classes` (PR #12).
+
+| Elemento na modelagem conceitual | Banco real |
+|---|---|
+| Especialização total e disjunta de `Usuario` em **Doador**, **Receptor** e **Adm** | Substituída por `usuarios.tipo` (`PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE`, `ADMIN`). "Doador" deixou de ser um tipo: quem doa é qualquer usuário em `doacoes.doador_id`. "Receptor" virou a `ENTIDADE`. `ADMIN` continua |
+| `Usuario` 1,1 — `Endereço` 1,n | Mantido: `usuarios` 1 : N `enderecos` |
+| `Usuario` 1,1 — `Telefone` 1,n | Mantido: `usuarios` 1 : N `telefones` |
+| Entidade própria **Instituição**, com endereços e telefones próprios | Vira `entidades`, um perfil ligado a um usuário PJ. Endereços e telefones são os do **usuário** dono. A entidade guarda só `email_contato`, `telefone_contato` e `whatsapp` públicos |
+| **Receptor** `Responsável` pela Instituição (1,1 : 1,1) | Sem relacionamento. O responsável é só **texto** na entidade: `responsavel_nome` e `responsavel_cpf` (RN46) |
+| Instituição **cadastra** Projetos (1,1 : 1,n) | `entidades` 1 : N `campanhas`. "Projeto" passou a se chamar **campanha** |
+| **Doação** como relacionamento entre Doador e Projetos (n : n) | `doacoes` é uma tabela própria, com `doador_id`, `entidade_id` e `campanha_id` **opcional** (doação direta à entidade, RN66 e RN68) |
+
+### 5.3 Diagrama de classes original (#34) × banco real
+
+Fonte: `Back-end/modelagens/diagrama-classes.md` da branch `branch#diagrama-classes`.
+
+| Elemento no diagrama de classes | Banco real |
+|---|---|
+| Identificadores `int` | Todos os ids são **UUID** |
+| `Usuario.documento` (um campo) | Dois campos em tabelas separadas: `pessoas_fisicas.cpf` e `pessoas_juridicas.cnpj`, ambos `UNIQUE` |
+| `Usuario.telefone` (um `int`) e `Usuario.senha` | `telefones` (tabela, número em texto, com tipo) e `usuarios.senha_hash` (apenas o hash) |
+| `Usuario.endereco` (um endereço) | `enderecos` (um usuário pode ter vários) |
+| `Endereco.numero` `int`, `Endereco.pais` | `enderecos.numero` é texto (VARCHAR 20). **`pais` não existe**; foram acrescentados `complemento`, `uf` e `cep` |
+| `Doacao.item` | **Não existe.** A doação é só financeira (`valor`, forma de pagamento PIX) |
+| `Doacao.receptorId` | Vira `doacoes.entidade_id`. O destino é sempre uma entidade |
+| `Doacao.status` (texto livre) | `CHECK` em `PENDENTE`, `CONFIRMADA`, `CANCELADA` |
+| `Doacao.data` | `doacoes.data_doacao` |
+| `Projeto.nome` | `campanhas.titulo` |
+| `Projeto.tipo` e `Projeto.formaDoacao` | `tipo` virou `campanhas.categoria` (opcional, V4). **`formaDoacao` não existe** |
+| `Projeto.instituicaoId` | `campanhas.entidade_id` |
+| Métodos (`fazerDoacao`, `confirmarDoacao`, `calcularValorRecebido` etc.) | Não fazem parte do banco: a lógica fica nos serviços do back-end |
+| `Instituicao.nome`, `Instituicao.telefone`, `Instituicao.endereco` | `razao_social` em `pessoas_juridicas`, `nome_fantasia` em `entidades`, e telefone/endereço do usuário dono |
+
+### 5.4 Modelagem lógica (#35) e modelo planejado × banco real
+
+> A issue #35 não tem descrição e **não localizei um documento identificado como modelagem lógica**. Como referência lógica foram usados o mapeamento planejado de [`entidades-envolvidas.md`](./entidades-envolvidas.md) e o esquema relacional do semestre passado (seção 5.5).
+
+| Elemento no modelo planejado | Banco real |
+|---|---|
+| `AGENDAMENTO` (data, horário, status, observações) ligado a usuário e projeto | **Não existe.** O back-end o lista como fora do MVP, junto com Pedido, Item de Pedido e Produto |
+| `RESPONSAVEL`: pessoa física N : 1 pessoa jurídica | **Não existe como relacionamento.** Substituído por `responsavel_nome` e `responsavel_cpf` na entidade |
+| `DOACAO` com valor, data, forma de pagamento e observações | Implementado (`valor`, `data_doacao`, `forma_pagamento`, `observacao`) |
+| `DOACAO` ligada a um `USUARIO` e a um `PROJETO` (N : 1 cada) | O projeto (campanha) é **opcional**, e a doação também aponta sempre para a `entidade` |
+| `USUARIO` com data de cadastro e status | Implementado (`data_cadastro`, `status`) |
+| `PESSOA FISICA` com CPF e data de nascimento | Implementado |
+| `PESSOA JURIDICA` com CNPJ e razão social | Implementado |
+| `PROJETO` com nome, descrição, objetivo, período e status | Implementado como `campanhas`: `titulo`, `descricao`, `meta_valor` (objetivo em reais), `data_inicio`, `data_fim` e `status` |
+| `TELEFONE` e `ENDERECO` com logradouro, número, bairro, cidade, UF e CEP | Implementado, com `complemento` a mais |
+
+A tabela "Modelo de Dados" do [`README.md`](../README.md) da raiz ainda lista `Agendamento`, `Pedido / Item Pedido` e `Produto`, que **não existem no banco**, e não lista `Entidade` nem `Campanha`. Ela precisa ser atualizada.
+
+### 5.5 Esquema relacional do semestre passado × banco real
+
+Referência histórica: o back-end .NET da branch `dev-backend` (removida do repositório), com 7 tabelas (`Usuario`, `PessoasFisicas`, `PessoasJuridicas`, `Endereco`, `Telefone`, `Projetos`, `Doacao`). Está aqui só para rastrear o que mudou.
+
+| Aspecto | Esquema do semestre passado | Banco real |
+|---|---|---|
+| Identificadores | `int` autoincrementado | UUID |
+| Senha | Coluna `Password` com texto simples | `senha_hash` (só o hash) |
+| Unicidade | Sem unicidade em e-mail, CPF e CNPJ | `UNIQUE` em e-mail, CPF e CNPJ |
+| Tipo do usuário | Enum `TipoUsuario` (Indefinido, Administrador, PessoaFisica, PessoaJuridica) | `usuarios.tipo` com `CHECK` e FK composta que garante a especialização disjunta |
+| Doação | `DoadorId` e `ReceptorId` **sem chave estrangeira**; campos `Local` e `DataPlanejada`; sem valor | FKs para usuário, entidade e campanha; `valor`, forma de pagamento, status e comprovante. `Local` e `DataPlanejada` **não existem** |
+| Projeto | Tabela `Projetos` (título, descrição, data, categoria) | Tabela `campanhas`. A migração V4 trouxe `categoria` e colunas de rastreio (`*_legado*`), **sem importar dados** |
+| Telefone | `Ddd` e `Numero` separados | `numero` único e `tipo` (celular, fixo, WhatsApp) |
+| Endereço | Inclui `Pais`; sem complemento nem sigla | `uf` (2 letras), `complemento`; **sem `pais`** |
+| Texto | `longtext` sem limite, sem validação | `VARCHAR(n)` com tamanho máximo e `CHECK` |
+| Exclusão de usuário | `ON DELETE CASCADE` apaga perfis, endereços, telefones e projetos | `ON DELETE RESTRICT` em todas as FKs (sem exclusão física, RN51) |
+| Entidades e campanhas | Não existiam como tabelas | `entidades` e `campanhas` |
+| Status | Sem status em usuário, projeto ou doação | Status com `CHECK` em usuário, entidade, campanha e doação |
+
+---
+
+## 6. Pontos de atenção do modelo atual
+
+Observações verificadas nas migrações. Servem de insumo para as equipes de back-end, banco e QA. Nenhuma foi alterada por este documento.
+
+| # | Ponto | Impacto |
+|---|---|---|
+| 1 | O banco só valida o **tamanho** de CPF (14), CNPJ (18) e CEP (9), não os dígitos verificadores nem o formato | A validação de dígitos fica na aplicação |
+| 2 | A **totalidade** da especialização (todo PF, PJ e ENTIDADE ter a sua linha) não é imposta pelo banco | Depende do serviço de cadastro e da transação única |
+| 3 | `doacoes.doador_id` aceita **qualquer tipo de usuário**, inclusive ADMIN e usuário `INATIVO` | A regra de quem pode doar fica no serviço (ver item 2 da seção 5.1) |
+| 4 | Regras como idade mínima de 18 anos e `data_inicio` fora do passado não têm constraint no banco | Verificar se o serviço as aplica |
+| 5 | Não há colunas de **quem** alterou um registro, só `created_at` e `updated_at`. O RNF-009 pede usuário, data e ação | Auditoria de campanhas e doações ainda não está coberta pelo modelo |
+| 6 | `forma_pagamento` só aceita `PIX`, e o pagamento ainda é simulado (decisão PV01 pendente) | Trocar ou ampliar a forma de pagamento exige migração nova |
+| 7 | O banco garante `data_fim >= data_inicio`, mas não relaciona o `status` da campanha às datas (por exemplo, uma campanha `ATIVA` com `data_fim` já passada) | O encerramento ou a transição de status por data depende do serviço |
+| 8 | Não há doação de itens nem agendamento no banco, embora o front-end tenha essas telas em demonstração | Dependência de modelagem futura (ver seção 5.4) |
+
+---
+
+## 7. Limitações desta documentação
+
+- As issues #15, #34 e #35 não têm descrição. Os artefatos comparados foram identificados pelo conteúdo: a imagem conceitual e o diagrama de classes da branch `branch#diagrama-classes`. **Não há documento identificado como modelagem lógica** (#35).
+- O schema foi verificado em H2 (modo PostgreSQL), e não em um PostgreSQL 16 real.
+- Os índices foram lidos dos arquivos SQL.
+- Este documento não verifica o código dos serviços. Onde se diz "fica no serviço", é uma inferência a partir da ausência de constraint no banco.
+
+## 8. Manutenção
+
+- A fonte da verdade é a pasta `db/migration` do `doasync-backend`. Revise este documento sempre que entrar uma migração nova.
+- Quando o modelo mudar, atualize também o [`DER.png`](./DER.png), o [`entidades-envolvidas.md`](./entidades-envolvidas.md) e a tabela "Modelo de Dados" do `README.md` da raiz.
+- Para conferir a estrutura real, suba a API com o perfil `dev` (H2) ou `prod` (PostgreSQL) e consulte o `information_schema`. No `psql`, use `\d nome_da_tabela`.
