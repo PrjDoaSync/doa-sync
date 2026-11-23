@@ -1,373 +1,250 @@
 # Handoff UI/UX e Estados de Interface (erro, vazio, loading)
 
 > **DOC-12 — Issue #191** · Equipe de Documentação · Semestre 2026/2
+> Assume a issue **#72** (TS-05-15, guia de handoff de UI/UX) e cobre os estados pedidos em [`qa/relatorio-qa-shiftleft-sprint2.md`](../qa/relatorio-qa-shiftleft-sprint2.md), seções 4.2 e 4.3.
 
-## 1. Objetivo e como usar
+## 1. Objetivo, escopo e fontes
 
-Este documento entrega ao desenvolvimento front-end a especificação dos **estados de interface** de cada tela do DoaSync: carregando (loading), vazio, erro, sucesso e desabilitado. Ele complementa os wireframes, que mostram só o estado "com dados", e o Design System, que define componentes mas não define esses estados por tela.
+Este documento entrega ao desenvolvimento do front-end Web:
+
+1. o **mapa das telas do Figma** com link direto para cada frame e a rota correspondente no código;
+2. a **correspondência entre os tokens** do Figma/Design System e as variáveis do projeto;
+3. os **estados de interface** (loading, vazio, erro, sucesso, desabilitado) e **como o código atual já os trata**;
+4. as **mensagens padrão por código HTTP** (401, 403, 404, 409, 422 e 500);
+5. as **diferenças conhecidas** entre Figma, Design System e implementação, e as pendências.
 
 ### 1.1 Fontes
 
 | Fonte | Uso neste documento |
 |---|---|
-| [`wireframes.md`](../wireframes.md) | Lista de telas e seus elementos |
-| [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) | Tokens, componentes, feedback e acessibilidade |
-| [`requisitos.md`](../requisitos.md) | RNF-010, RNF-011, RNF-012 e RNF-014 (usabilidade, mensagens, acessibilidade, responsivo) |
-| [`regras-negocio.md`](../regras-negocio.md) e [`backend/rotas-api.md`](../backend/rotas-api.md) | Códigos de erro e contrato da API |
-| Código da branch `dev-frontend` (pasta `client/`, commit `b19016c`) | Estado real de implementação |
+| Código do [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend), branch `develop`, commit `75f14fc`, pasta `web/` | Estado real de implementação (seção 2) |
+| Documentos do `doasync-frontend` (`docs/frontend-cam-doa.md`, `frontend-ges-fechamento.md`, `frontend-design-base.md`, `componentes.md`) | Nós (`node-id`) dos frames do Figma e tokens confirmados no Figma |
+| [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) | Tokens, componentes e acessibilidade previstos |
+| [`qa/relatorio-qa-shiftleft-sprint2.md`](../qa/relatorio-qa-shiftleft-sprint2.md) §4.2 e §4.3 | Comportamento em erros HTTP, rede e estados ausentes |
+| [`backend/rotas-api.md`](../backend/rotas-api.md) | Formato dos erros da API |
+| [`requisitos.md`](../requisitos.md) | RNF-010, RNF-011, RNF-012 e RNF-014 |
 
 ### 1.2 Classificação das decisões
 
-Segue a convenção do Design System:
-
-- **PADRÃO OFICIAL:** já definido no Design System ou nos requisitos.
-- **PROPOSTA:** definido neste documento para preencher uma lacuna. **Pendente de validação** pelo Produto/UX antes de virar padrão.
-
-> O Design System só define explicitamente o estado *loading* de botão (spinner) e os toasts (fecham após 4 s). Todo o restante dos estados deste documento é **PROPOSTA**.
+| Etiqueta | Significado |
+|---|---|
+| **Implementado** | Verificado no código do `doasync-frontend` |
+| **Oficial** | Definido no Design System, nos requisitos ou no relatório de QA |
+| **Proposta** | Definido aqui para preencher uma lacuna. Precisa de validação do Produto/UX |
+| **Pendente** | Depende de decisão ou trabalho de outra equipe |
 
 ---
 
-## 2. Estado atual da implementação (verificado no código)
+## 2. Referência do front-end vigente
 
-Análise da branch `dev-frontend`. Importa para o handoff porque várias regras abaixo ainda não existem no código.
+> **Correção em relação à versão anterior deste documento.** A versão anterior analisava a branch `dev-frontend` (Next.js, cores verde e amarelo, primeiro semestre). Ela **não** faz parte do projeto atual e foi removida da análise. A referência passa a ser o `doasync-frontend`, conforme a stack definida em [`stack.md`](../stack.md).
 
-| # | Constatação | Evidência |
+Verificado em `doasync-frontend`, branch `develop`, commit `75f14fc`:
+
+| Item | Valor |
+|---|---|
+| Pasta | `web/` |
+| Framework | React 19 + Vite 8, JavaScript/JSX (sem TypeScript) |
+| Rotas | React Router 7 |
+| HTTP | Axios, `timeout` de 15 s, URL base em `VITE_API_URL` (padrão `http://localhost:8080/api`) |
+| Estilos | CSS próprio, com variáveis em `src/styles/tokens.css`. **Não usa Tailwind** |
+| Fonte | Inter 4.1 variável, hospedada em `public/fonts` (licença OFL) |
+| Ícones | SVG próprio em `components/Ui.jsx` (componente `Icon`). **Não usa Phosphor** |
+| Testes | Vitest + React Testing Library |
+| Dados | Modo demonstração: dados em memória (`DemoProvider`), sem chamar a API |
+| Mobile | Não há app mobile neste repositório |
+
+O [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) cita Tailwind CSS e Phosphor Icons como base. Isso **não corresponde** ao código atual (ver seção 10, item D-07).
+
+---
+
+## 3. Mapa de telas: Figma × rotas
+
+### 3.1 Arquivo do Figma
+
+| Arquivo | Link | Onde é citado |
 |---|---|---|
-| 1 | **Nenhum estado de loading, vazio ou erro está implementado.** Não há skeleton, spinner, mensagem de erro ou tela de lista vazia. | Ausência nos arquivos de `client/app` e `client/components` |
-| 2 | Feedback é feito com `alert()` do navegador ("Bem vindo ao sistema", "Cadastro feito com sucesso !", "Email enviado para recuperação de senha !"). | `sign-in`, `sign-up` e `recover-password` |
-| 3 | Os formulários **não enviam dados nem validam**: o componente `Input` não recebe `value`, `onChange`, `name` nem mensagem de erro. | `components/Input.tsx` |
-| 4 | O componente `Button` próprio não tem estado `disabled` nem `loading`. O `ui/button.tsx` (shadcn) tem `disabled`, mas só ele. | `components/Button.tsx`, `components/ui/button.tsx` |
-| 5 | Campos sem `<label>`: o rótulo é só o placeholder, que some ao digitar. | `components/Input.tsx` |
-| 6 | Cada `Input` e `Button` é renderizado **duas vezes** (um para desktop, outro para mobile) com `hidden`/`block`, duplicando elementos no DOM. Leitores de tela podem anunciar o campo duas vezes. | `components/Input.tsx`, `components/Button.tsx` |
-| 7 | Links "Esqueceu sua senha?", "Cadastre-se" e "Faça login" são `<p>`/`<span>` com `cursor-pointer`, sem navegação nem foco por teclado. | `sign-in`, `sign-up` |
-| 8 | `/home` e `/dashboard` são só um `<h1>`. Não há campanhas, doações nem indicadores ainda. | `app/(private)` |
-| 9 | O front **não chama a API**; logo não existe tratamento de erro HTTP. | busca por `fetch`/`axios`/`process.env` sem resultados |
+| `3eBaQzgxDIRMbhxY0K2DWa` | [Doasync (Figma)](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=0-1&m=dev) | Repositório `doasync-frontend` (README e todos os documentos). **É o arquivo usado nos links desta seção**, porque os `node-id` abaixo foram inspecionados nele |
+| `JaIKR7tTkfIJ3fSk4weadC` | [Doasync (Figma)](https://www.figma.com/design/JaIKR7tTkfIJ3fSk4weadC/Doasync?node-id=0-1&m=dev) | Documentos `frontend/frontend-web.md` e `frontend/frontend-validacao.md` deste repositório |
 
-### 2.1 Divergência de identidade visual (decisão pendente)
+> ⚠️ **Dois arquivos do Figma com o mesmo nome.** Os dois endereços respondem HTTP 200, mas o conteúdo exige login no Figma e **não foi possível confirmar o acesso** aos arquivos nem se os `node-id` existem no segundo. Pendência D-01: confirmar qual é o arquivo oficial e padronizar os links.
 
-| Aspecto | Design System (docs) | Código implementado |
-|---|---|---|
-| Cor principal | Azul `#2563EB` | Verde `#2E7D32` com destaque amarelo `#FFD600` |
-| Fonte | Inter | Poppins (variável `--font-poppins`, em `globals.css`) |
-| Ícones | Phosphor Icons | `lucide-react` |
-| Base de componentes | Tokens próprios do DS | shadcn/ui (tokens neutros padrão) |
+Formato do link de um frame: `https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=<NÓ>`, trocando `:` por `-` no número do nó (por exemplo, `49:3215` vira `49-3215`).
 
-**Impacto no handoff:** as especificações de estado usam cores **por papel** (`feedback.error`, `feedback.success` etc.), que independem da paleta da marca. Quando a paleta oficial for decidida, só os tokens `brand.*` mudam.
+### 3.2 Campanhas (CAM)
 
-### 2.2 Contraste das cores implementadas (calculado)
-
-Razão de contraste WCAG calculada a partir dos HEX do código. Meta: 4,5:1 para texto normal e 3:1 para texto grande (RNF-012).
-
-| Combinação | Uso no código | Razão | Resultado |
+| Frame | Tela | Nó | Rota no código |
 |---|---|---|---|
-| Verde `#2E7D32` sobre amarelo `#FFD600` | Texto do botão (32 px, negrito) | 3,63:1 | Passa (texto grande) |
-| Amarelo `#FFD600` sobre verde `#2E7D32` | "Clique aqui", "Faça login" (14 a 16 px) | 3,63:1 | **Falha** (texto pequeno exige 4,5:1) |
-| Branco sobre verde `#2E7D32` | Títulos e textos na área verde | 5,13:1 | Passa |
-| Verde `#2E7D32` sobre branco | Placeholder dos inputs | 5,13:1 | Passa |
-| `#94A3B8` sobre branco | Token `color.text.muted` do DS (placeholders) | 2,56:1 | **Falha**, o próprio DS precisa de ajuste |
-
-Cores de feedback do Design System, também calculadas: erro `#991B1B` sobre `#FEE2E2` = 6,80:1; sucesso `#166534` sobre `#DCFCE7` = 6,49:1; alerta `#854D0E` sobre `#FEF9C3` = 6,38:1; informação `#1E40AF` sobre `#DBEAFE` = 7,15:1. Todas passam.
-
----
-
-## 3. Padrões globais de estado
-
-Valem para todas as telas, salvo exceção indicada na seção 4.
-
-### 3.1 Loading (carregando)
-
-| Situação | Tratamento | Tipo |
-|---|---|---|
-| Ação em botão (enviar formulário, doar) | Substituir o ícone/texto à esquerda por spinner, **desabilitar o botão**, manter o rótulo (ex.: "Entrando...") e a largura. Impedir duplo envio. | Oficial (DS 7.1) |
-| Carga inicial de lista ou cards | **Skeleton** com o mesmo formato do conteúdo final (mesma altura de card e quantidade: 3 cards ou 5 linhas de tabela). Evita salto de layout. | Proposta |
-| Carga de página inteira (rota privada) | Skeleton do layout (cabeçalho + área de conteúdo), sem spinner de tela cheia. | Proposta |
-| Carga muito rápida | Só mostrar skeleton se a resposta passar de **300 ms**, para evitar piscar. | Proposta |
-| Carga demorada | Após **10 s**, manter o skeleton e exibir texto "Isso está demorando mais que o normal..." com botão "Tentar novamente". | Proposta |
-
-Acessibilidade: o contêiner em carga recebe `aria-busy="true"`; o skeleton recebe `aria-hidden="true"`; um texto invisível ao olho (`sr-only`) com "Carregando..." dentro de `role="status"` anuncia a carga.
-
-### 3.2 Vazio (sem dados)
-
-Todo estado vazio tem: **ícone** (Phosphor, 48 px, cor `text.secondary`), **título** (`font.h3`), **texto de apoio** (`font.body`, `text.secondary`) e, quando existir ação útil, **um botão primário**. Texto centralizado, dentro da área da lista.
-
-Distinguir sempre os dois tipos:
-
-| Tipo | Quando | Mensagem |
-|---|---|---|
-| Vazio absoluto | Nunca houve dados | Explica o que fazer ("Você ainda não fez doações") |
-| Vazio por filtro/busca | Há dados, mas o filtro não encontrou | "Nenhum resultado para 'termo'" + botão "Limpar busca" |
-
-### 3.3 Erro
-
-Escolher o componente pelo escopo do erro:
-
-| Escopo | Componente | Comportamento |
-|---|---|---|
-| Campo inválido | Mensagem abaixo do campo, `font.caption`, texto `feedback.error`, ícone de aviso e borda `border-red-500` | Aparece ao sair do campo (blur) ou ao enviar. Campo recebe `aria-invalid="true"` e `aria-describedby` apontando para a mensagem. |
-| Erro do formulário (negócio) | Alerta in-page no topo do formulário (DS 7.8), `role="alert"` | Permanece até o usuário corrigir ou reenviar |
-| Falha ao carregar lista/página | Bloco de erro no lugar do conteúdo: ícone, título, texto e botão "Tentar novamente" | Mantém o cabeçalho da página |
-| Resultado de ação rápida | Toast no canto, fecha em 4 s (DS 7.8) | Oficial. Para erro, **não fechar sozinho** (proposta), pois o texto pode não ser lido a tempo |
-| Sem conexão | Faixa fixa no topo: "Você está sem conexão. Verifique sua internet." | Proposta |
-
-Regras de texto (RNF-011): linguagem simples, dizer o que houve e como resolver, **nunca** exibir stack trace, código interno ou mensagem crua da API. Nunca usar só cor para indicar erro: sempre ícone + texto.
-
-### 3.4 Mapeamento de erros da API para a interface
-
-Códigos conforme o contrato documentado em [`arquitetura.md`](../arquitetura.md) e [`backend/rotas-api.md`](../backend/rotas-api.md).
-
-> Os documentos descrevem o contrato de um back-end Spring Boot, mas o código existente em `dev-backend` é .NET e pode responder em outro formato. **Confirmar o formato real de erro com o back-end antes de implementar.**
-
-| HTTP | Significado | Resposta da interface |
-|---|---|---|
-| 400 | Requisição inválida | Alerta do formulário: "Não foi possível processar. Revise os dados e tente de novo." |
-| 401 | Não autenticado ou token expirado | Encerrar sessão local, redirecionar para `/sign-in` com aviso "Sua sessão expirou. Entre novamente." e voltar à tela de origem após o login |
-| 403 | Sem permissão | Tela "Você não tem acesso a esta página" com botão "Voltar ao início" |
-| 404 | Não encontrado | Tela "Não encontramos o que você procura" com botão "Voltar" |
-| 409 | Conflito (ex.: e-mail já cadastrado) | Erro no campo envolvido ("Este e-mail já está cadastrado") |
-| 422 | Validação por campo | Exibir cada mensagem no campo correspondente (`erros.campo`); foco no primeiro campo com erro |
-| 5xx | Falha do servidor | Alerta/bloco de erro: "Algo deu errado do nosso lado. Tente novamente em instantes." + "Tentar novamente" |
-| Sem resposta | Rede ou timeout | Mesmo tratamento de "Sem conexão" ou 5xx, conforme o caso |
-
-### 3.5 Sucesso e desabilitado
-
-- **Sucesso de ação simples** (salvar perfil, atualizar campanha): toast de sucesso, 4 s. Substitui o `alert()` atual.
-- **Sucesso que encerra um fluxo** (doação): tela dedicada (ver 4.8), não toast.
-- **Desabilitado:** opacidade 50%, `cursor-not-allowed`, atributo `disabled` (DS 7.1). Sempre que possível, informar *por que* está desabilitado em texto de apoio, pois o botão desabilitado não recebe foco.
-- **Foco:** nunca remover o contorno; usar `ring-2 ring-offset-2` (DS 9).
-
----
-
-## 4. Estados por tela
-
-Todos os textos são **PROPOSTA** (pendentes de validação de UX). Tabelas listam só o que **difere ou complementa** os padrões da seção 3. Onde nada é dito, vale o padrão global.
-
-Legenda de status em badges (DS 7.5, tokens de feedback): Sucesso = verde, Atenção = amarelo, Erro = vermelho, Informação = azul. Nunca só cor: o badge sempre tem texto.
-
-### 4.1 Tela inicial (wireframe 1)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Skeleton de 3 cards na faixa "Campanhas ativas". Título e botão "Ver campanhas" aparecem de imediato (não dependem da API). |
-| Vazio | Ícone de coração, título "Ainda não há campanhas ativas", texto "Volte em breve para conhecer novas causas." Sem botão. |
-| Erro | Bloco no lugar dos cards: "Não conseguimos carregar as campanhas" + "Tentar novamente". O restante da página continua utilizável. |
-| Dados | Até 3 cards com progresso. |
-
-### 4.2 Login (wireframe 2)
-
-| Estado | Especificação |
-|---|---|
-| Padrão | Botão "Entrar" habilitado. |
-| Loading | Botão "Entrando..." com spinner e desabilitado; campos ficam `readonly`. |
-| Erro de campo | E-mail vazio: "Informe seu e-mail". Formato inválido: "Informe um e-mail válido". Senha vazia: "Informe sua senha". |
-| Erro de credencial (401) | Alerta no topo: "E-mail ou senha incorretos." **Não indicar qual campo está errado** (RF-002). Manter o e-mail digitado; limpar a senha e focar nela. |
-| Conta inativa | Alerta: "Sua conta está desativada. Entre em contato com a plataforma." |
-| Erro de rede/5xx | Padrão da seção 3.4. |
-| Sucesso | Redirecionar ao destino conforme o perfil (doador → campanhas, entidade → painel da entidade, admin → painel administrativo). Sem `alert()`. |
-
-### 4.3 Cadastro (wireframe 3)
-
-| Estado | Especificação |
-|---|---|
-| Padrão | Seleção "Tipo de conta" obrigatória. Campos extras de entidade (CNPJ, descrição, endereço) aparecem ao escolher "Entidade". |
-| Loading | Botão "Cadastrando..." desabilitado. |
-| Erro de campo | Nome vazio: "Informe seu nome". Senha curta: "A senha deve ter ao menos X caracteres" (valor a definir pelo back-end). CPF/CNPJ inválido: "Informe um CPF/CNPJ válido". Tipo de conta não escolhido: "Escolha o tipo de conta". |
-| Conflito (409) | No campo e-mail: "Este e-mail já está cadastrado. Quer entrar?" com link para o login (RF-001). |
-| Aceite LGPD | Caixa de aceite da política de privacidade obrigatória (RNF-005). Sem aceite: "Para continuar, aceite a política de privacidade". |
-| Sucesso (doador) | Toast "Conta criada com sucesso" e login automático ou redirecionamento ao login. |
-| Sucesso (entidade) | Tela de confirmação: "Cadastro enviado. Sua entidade está **em análise** e você será avisado após a aprovação." (entidade nasce `PENDENTE`). |
-
-### 4.4 Recuperar senha (existe no código, fora dos wireframes)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Botão "Enviando..." desabilitado. |
-| Sucesso | Mensagem fixa na tela (não toast): "Se este e-mail estiver cadastrado, enviaremos um link de recuperação." Mesma resposta com ou sem e-mail cadastrado, para não revelar quais e-mails estão cadastrados. |
-| Erro | E-mail inválido no campo; falha de rede/5xx como no padrão. |
-| Pendência | O envio de e-mail depende da decisão PV05 em [`arquitetura.md`](../arquitetura.md). Até lá, a tela deve indicar indisponibilidade em vez de simular sucesso. |
-
-### 4.5 Campanhas — listagem e busca (wireframe 4)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Skeleton de 3 a 5 cards largos. Barra de busca já utilizável. |
-| Vazio absoluto | "Nenhuma campanha disponível no momento" + texto "Novas campanhas aparecerão aqui." |
-| Vazio por busca | "Nenhum resultado para '<termo>'" + "Limpar busca". |
-| Erro | Bloco "Não conseguimos carregar as campanhas" + "Tentar novamente". |
-| Busca em andamento | Aplicar com *debounce* de 300 ms; manter a lista anterior com `aria-busy` até chegar a nova. |
-| Paginação | Carregar mais por página (RNF-028). Durante "carregar mais", spinner no rodapé da lista; em erro, "Não foi possível carregar mais" + "Tentar novamente", sem perder os itens já mostrados. |
-| Barra de progresso | Valor visual limitado a 100%. Se arrecadado > meta, mostrar o valor real no texto ("R$ 5.500 de R$ 5.000") e uma etiqueta "Meta atingida". Barra com `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax` e texto equivalente. |
-
-### 4.6 Detalhes da campanha (wireframe 5)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Skeleton do título, bloco de descrição (4 linhas) e bloco de arrecadação. Botão "Fazer doação" desabilitado até carregar. |
-| Não encontrada (404) | Tela "Esta campanha não existe ou foi removida" + "Ver campanhas". |
-| Campanha encerrada | Badge "Encerrada". Botão "Fazer doação" **desabilitado** com texto de apoio "Esta campanha foi encerrada e não recebe novas doações." (RF-013). |
-| Entidade desativada | Mesmo tratamento de encerrada, com texto "Esta campanha não está recebendo doações." |
-| Visitante sem login | "Fazer doação" leva ao login (RF-020). Após logar, voltar para esta campanha. |
-| Erro | Bloco de erro com "Tentar novamente". |
-
-### 4.7 Fazer doação (wireframe 6)
-
-| Estado | Especificação |
-|---|---|
-| Padrão | "Continuar" desabilitado até haver valor válido. |
-| Erro de campo | Vazio: "Informe o valor da doação". Zero ou negativo: "O valor deve ser maior que zero". Formato inválido: "Use apenas números, por exemplo 50,00". |
-| Loading | Botão "Processando doação..." desabilitado; **impedir duplo clique** (risco de doação duplicada). Se a API oferecer idempotência, enviar a chave. |
-| Campanha encerrada durante o fluxo | Alerta: "Esta campanha foi encerrada e não pode mais receber doações." + "Ver outras campanhas". |
-| Falha de pagamento | Alerta: "Não foi possível concluir sua doação. Nenhum valor foi cobrado." + "Tentar novamente". Só usar essa frase se o back-end garantir que não houve cobrança (RNF-008); caso contrário, "Não conseguimos confirmar sua doação. Confira em Minhas doações antes de tentar de novo." |
-| Pendência | O meio de pagamento real (PIX) depende da decisão PV01. Enquanto for simulado, a interface deve indicar claramente que é um ambiente de teste. |
-
-### 4.8 Confirmação da doação (wireframe 7)
-
-| Estado | Especificação |
-|---|---|
-| Sucesso | Tela dedicada com ícone de sucesso, título "Doação realizada!", resumo (campanha, valor, data, forma de pagamento) e dois botões: "Ver minhas doações" e "Voltar para campanhas". Foco movido ao título e anunciado (`role="status"`). |
-| Doação pendente | Se o status for "iniciada" (RF-022): ícone de relógio, "Estamos confirmando sua doação" e atualização automática do status; sem texto de sucesso. |
-| Acesso direto sem doação | Redirecionar para campanhas. |
-| Recarregar a página | Não duplicar a doação; a tela deve ser carregada a partir do id da doação, não de um novo envio. |
-
-### 4.9 Histórico do doador (wireframe 8)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Skeleton de 5 linhas de tabela. |
-| Vazio | "Você ainda não fez doações" + botão "Ver campanhas". |
-| Erro | "Não conseguimos carregar suas doações" + "Tentar novamente". |
-| Status | Coluna com badge: Concluída (sucesso), Iniciada (atenção), Cancelada (erro). |
-| Doação anônima | Aparece normalmente para o próprio doador, com indicação "Anônima". |
-| Mobile | Tabela vira lista de cards empilhados (campanha, data, valor, status). |
-
-### 4.10 Painel da entidade (wireframe 9)
-
-| Estado | Especificação |
-|---|---|
-| Entidade pendente | Faixa de informação no topo: "Sua entidade está em análise. Você poderá criar campanhas após a aprovação." Botão "Criar campanha" desabilitado com esse motivo. |
-| Entidade reprovada | Faixa de erro: "Seu cadastro não foi aprovado." + contato com a administração. |
-| Entidade inativa | Faixa de atenção: "Sua entidade está desativada." Ações de escrita desabilitadas. |
-| Sem campanhas | "Você ainda não criou campanhas" + botão "Criar campanha". |
-| Sem doações | Aba Doações: "Sua entidade ainda não recebeu doações." |
-| Loading e erro | Skeleton por aba; erro por aba, sem derrubar o painel inteiro. |
-| Salvar informações | Botão em loading; sucesso por toast; conflito/validação por campo. |
-| Sem permissão (403) | Doador ou outra entidade tentando abrir: tela de acesso negado. |
-
-### 4.11 Criar campanha (wireframe 10)
-
-| Estado | Especificação |
-|---|---|
-| Erro de campo | Título vazio: "Informe o título". Meta vazia ou ≤ 0: "Informe uma meta maior que zero". Data de encerramento anterior à de início: "A data de encerramento deve ser depois da data de início". Data no formato inválido: "Use o formato DD/MM/AAAA". |
-| Loading | Botão "Criando campanha..." desabilitado. |
-| Sucesso | Toast "Campanha criada" e retorno ao painel, com a campanha destacada na lista. |
-| Sair com dados preenchidos | Confirmar em modal: "Descartar alterações?" com "Continuar editando" e "Descartar". |
-| Entidade não aprovada | Tela inacessível: aviso e redirecionamento ao painel (ver 4.10). |
-
-### 4.12 Painel administrativo (wireframe 11)
-
-| Estado | Especificação |
-|---|---|
-| Loading | Cada card de indicador tem skeleton próprio; a falha de um indicador não derruba os outros. |
-| Valor zero | Mostrar **"0"** (e "R$ 0,00"). Zero é um dado válido; não tratar como vazio nem como erro. |
-| Erro de indicador | No card: "—" e botão pequeno "Tentar novamente". Texto de apoio "Indisponível". |
-| Fila de aprovação vazia | "Nenhuma entidade aguardando aprovação" com ícone de sucesso. |
-| Aprovar/Reprovar | Botão da linha em loading e desabilitado; ao concluir, a linha sai da fila com toast "Entidade aprovada" / "Entidade reprovada". Em erro, a linha permanece e o toast de erro não fecha sozinho. |
-| Reprovar | Confirmação em modal (ação sensível) com motivo opcional. |
-| Admin desativando a si mesmo | Ação desabilitada com explicação "Você não pode desativar a própria conta." (regra da arquitetura). |
-| Acesso negado (403) | Qualquer perfil diferente de administrador vê tela de acesso negado. |
-
----
-
-## 5. Responsividade (RNF-014)
-
-Breakpoints do Design System: mobile até 767 px (4 colunas, margem 16 px), tablet 768 a 1023 px (8 colunas, margem 24 px) e desktop a partir de 1024 px (12 colunas, contêiner máximo de 1280 px).
-
-| Elemento de estado | Mobile | Desktop |
-|---|---|---|
-| Skeleton de cards | 1 coluna | 3 colunas |
-| Toast | Parte inferior, largura total menos margens | Canto superior ou inferior direito |
-| Bloco de erro/vazio | Padding 24 px, botão largura total | Centralizado, botão com largura do conteúdo |
-| Tabelas | Viram cards empilhados | Tabela |
-| Botão principal | `Large` (48 px), área de toque mínima 44 × 44 px | `Medium` (40 px) |
-
-> No código atual, `Input` e `Button` duplicam o elemento para mobile e desktop e usam `vw`/`vh`. Para os estados funcionarem (foco, erro, `aria-describedby`), recomenda-se um **único** elemento com classes responsivas (`w-full md:w-...`).
-
----
-
-## 6. Acessibilidade dos estados (RNF-012)
-
-| Item | Regra |
-|---|---|
-| Anúncio de loading | `aria-busy="true"` no contêiner e texto "Carregando..." em `role="status"`. |
-| Anúncio de erro | Erro de formulário em `role="alert"`; erro de campo ligado por `aria-describedby` e `aria-invalid="true"`. |
-| Foco após erro de envio | Mover o foco para o primeiro campo inválido. |
-| Foco após sucesso de fluxo | Mover o foco para o título da tela de confirmação. |
-| Toast | Em `role="status"` (sucesso) ou `role="alert"` (erro). Toasts de erro com botão de fechar e sem fechamento automático. |
-| Cor | Nunca só cor: ícone + texto em erro, sucesso, alerta e status. |
-| Foco visível | Nunca `outline: none` sem substituto; `focus:ring-2`. |
-| Rótulos | Todo campo com `<label>` visível. Placeholder não substitui rótulo. |
-| Botão desabilitado | Informar o motivo em texto próximo, pois não recebe foco. |
-| Movimento | Respeitar `prefers-reduced-motion`: sem animação de skeleton e spinner girando em loop rápido para quem pediu. |
-| Teclado | Fluxo de doação concluível só com teclado (RNF-012). |
-
----
-
-## 7. Catálogo de textos (microcopy)
-
-Padrão de tom: direto, acolhedor, sem jargão técnico, sem culpar o usuário. Frases curtas, sem exclamação em erros.
-
-| Situação | Texto |
-|---|---|
-| Carregando | "Carregando..." |
-| Erro genérico | "Algo deu errado do nosso lado. Tente novamente em instantes." |
-| Sem conexão | "Você está sem conexão. Verifique sua internet." |
-| Botão de repetir | "Tentar novamente" |
-| Sessão expirada | "Sua sessão expirou. Entre novamente." |
-| Sem permissão | "Você não tem acesso a esta página." |
-| Não encontrado | "Não encontramos o que você procura." |
-| Campo obrigatório | "Informe <nome do campo>" |
-| E-mail inválido | "Informe um e-mail válido" |
-| Salvo com sucesso | "Alterações salvas" |
-| Ação irreversível | "Esta ação não pode ser desfeita." |
-
----
-
-## 8. Pendências e decisões abertas
-
-| ID | Pendência | Responsável sugerido | Bloqueia |
+| CAM01 | Home | [49:3215](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=49-3215) | `/` |
+| CAM02 | Listagem | [49:3324](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=49-3324) | `/explorar` |
+| CAM03 | Detalhe | [49:3494](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=49-3494) | `/campanhas/:id` |
+| CAM04 | Dados básicos | [49:3603](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=49-3603) | `/campanhas/nova` (etapa 1) |
+| CAM05 | Metas e itens | [49:3729](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=49-3729) | `/campanhas/nova` (etapa 2) |
+| CAM06 | Revisão e imagens | [51:2870](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=51-2870) | `/campanhas/nova` (etapa 3) |
+| CAM07 | Minhas campanhas | [51:3029](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=51-3029) | `/campanhas` |
+| CAM08 | Edição | [51:3186](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=51-3186) | `/campanhas/:id/editar` |
+| CAM09 | Acompanhamento | [51:3364](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=51-3364) | `/campanhas/:id/acompanhamento` |
+| CAM10 | Encerramento | [51:3588](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=51-3588) | `/campanhas/:id/prestacao-de-contas` |
+
+### 3.3 Doações (DOA)
+
+O fluxo de doação acontece dentro de uma única rota, `/doar/:id`, em etapas. A correspondência entre cada frame e a etapa é uma inferência a partir da descrição dos frames.
+
+| Frame | Tela | Nó | Rota no código |
 |---|---|---|---|
-| H-01 | Definir a paleta oficial (azul do DS ou verde/amarelo implementado), a fonte (Inter ou Poppins) e a biblioteca de ícones | Produto/UX | Cores de marca e ícones das telas de estado |
-| H-02 | Validar as **propostas** deste documento (skeleton, tempos de 300 ms e 10 s, toast de erro persistente, textos) | Produto/UX | Padronização dos estados |
-| H-03 | Confirmar o formato real de erro da API (.NET na `dev-backend` x contrato Spring da documentação) | Back-end | Seção 3.4 |
-| H-04 | Corrigir contraste: links amarelos sobre verde (3,63:1) e `color.text.muted` do DS para placeholder (2,56:1) | UX/Front-end | RNF-012 |
-| H-05 | Substituir `alert()` por toast e alertas in-page | Front-end | Seções 3.3 e 3.5 |
-| H-06 | Unificar `Input` e `Button` (elemento único, com `label`, `error`, `disabled`, `loading`) | Front-end | Todos os estados de formulário |
-| H-07 | Transformar links de texto em `<Link>` navegáveis por teclado | Front-end | Acessibilidade |
-| H-08 | PV01 (pagamento) e PV05 (e-mail) | Gestão | Seções 4.4, 4.7 e 4.8 |
-| H-09 | Definir regra mínima de senha e mensagens correspondentes | Back-end/Produto | Seção 4.3 |
-| H-10 | Registrar a validação visual no checklist [`frontend-validacao.md`](./frontend-validacao.md), que hoje está todo como "Pendente" | QA/Front-end | Aprovação final |
+| DOA01 | Tipo de doação | [53:2143](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=53-2143) | `/doar/:id` (etapa de tipo) |
+| DOA02 | Identificação | [53:2505](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=53-2505) | `/doar/:id` (etapa de identificação) |
+| DOA03 | Financeira | [53:2246](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=53-2246) | `/doar/:id` (contribuição) |
+| DOA04 | PIX | [53:2639](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=53-2639) | `/doar/:id` (pagamento) |
+| DOA05 | Cartão e boleto | [55:2609](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=55-2609) | `/doar/:id` (pagamento) |
+| DOA06 | Itens | [53:2361](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=53-2361) | `/doar/:id` (contribuição) |
+| DOA07 | Agendamento | [55:2749](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=55-2749) | `/doar/:id` (agendamento) |
+| DOA08 | Confirmação | [55:2891](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=55-2891) | `/doar/:id/confirmacao/:doacaoId` |
+| DOA09 | Histórico | [55:3024](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=55-3024) | `/minhas-doacoes` |
+| DOA10 | Detalhe da doação | [55:3207](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=55-3207) | `/minhas-doacoes/:doacaoId` |
+
+### 3.4 Gestão e Dashboard (GES)
+
+| Frame | Tela | Nó | Rota no código |
+|---|---|---|---|
+| GES01 | Login e recuperação | [65:3954](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=65-3954) | `/login` |
+| GES02 | Cadastro e onboarding | [65:4035](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=65-4035) | `/cadastro-entidade` |
+| GES03 | Dashboard geral | [65:4199](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=65-4199) | `/dashboard` |
+| GES04 | Dashboard analítico | [65:4357](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=65-4357) | `/dashboard/campanha` |
+| GES05 | Doações recebidas | [65:4559](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=65-4559) | `/doacoes` |
+| GES06 | Doadores e histórico | [69:4727](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=69-4727) | `/doadores` |
+| GES07 | Controle de itens | [69:4901](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=69-4901) | `/itens` |
+| GES08 | Relatórios e exportação | [69:5096](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=69-5096) | `/relatorios` |
+| GES09 | Usuários e permissões | [69:5282](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=69-5282) | `/configuracoes/usuarios` |
+| GES10 | Perfil e configurações | [69:5500](https://www.figma.com/design/3eBaQzgxDIRMbhxY0K2DWa/Doasync?node-id=69-5500) | `/configuracoes` |
+
+### 3.5 Frames mobile e rotas extras
+
+- **Frames mobile (390 px):** a issue #72 pede os links dos frames Web **e Mobile**. Os documentos do `doasync-frontend` só registram frames **desktop de 1440 px**. **Nenhum frame mobile foi identificado.** Pendência D-02.
+- **Rotas sem frame no Figma** (existem no código): `/entidades`, `/ajuda`, `/privacidade`, `/termos` e a rota de "página não encontrada" (`*`).
+- **Frames de estados:** o `doasync-frontend` registra que **não há frames separados** para os estados vazio, erro e loading. Eles foram definidos no código. Este documento passa a ser a especificação desses estados.
 
 ---
 
-## 9. Checklist de handoff (por tela)
+## 4. Tokens: correspondência Figma/Design System × projeto
 
-Marcar na entrega de cada tela pelo front-end e na revisão do QA.
+As variáveis do projeto ficam em `web/src/styles/tokens.css`. O Figma confirmou (inspeção de 19/11/2026, frames `49:3215` e `69:5500`) apenas: fundo `#F8FAFC`, título `#0F172A`, título de 28 px/peso 700/entrelinha 125%, botão 14 px/peso 600, padding de 40 px e espaçamento de 24 px no conteúdo administrativo. As demais cores foram mantidas pelo código e **ainda não foram conferidas** no Figma.
 
-- [ ] Estado de **loading** implementado (skeleton ou spinner de botão), sem salto de layout
-- [ ] Estado **vazio** implementado, com distinção entre vazio absoluto e vazio por filtro
-- [ ] Estado de **erro** implementado para campo, formulário e carga
-- [ ] Erros HTTP 401, 403, 404, 409, 422 e 5xx tratados conforme a seção 3.4
-- [ ] Botões com `disabled` e `loading`, sem envio duplicado
-- [ ] Nenhum `alert()` do navegador
-- [ ] Nenhuma mensagem técnica exibida ao usuário (RNF-011)
-- [ ] Todos os campos com `<label>`, `aria-invalid` e `aria-describedby` quando em erro
-- [ ] Foco visível e fluxo completo por teclado
-- [ ] Contraste mínimo 4,5:1 (texto) e 3:1 (texto grande e componentes)
-- [ ] Layout validado em mobile, tablet e desktop
-- [ ] Textos conferidos com o catálogo da seção 7
-- [ ] Evidência (captura de tela ou PR) registrada em [`frontend-validacao.md`](./frontend-validacao.md)
+| Papel | Design System | Variável no projeto | Valor no projeto | Situação |
+|---|---|---|---|---|
+| Ação principal | `color.brand.primary` `#2563EB` | `--azul` | `#2563eb` | Igual |
+| Fundo da página | `color.bg.page` `#F8FAFC` | `--fundo` | `#f8fafc` | Igual (confirmado no Figma) |
+| Superfície | `color.bg.surface` `#FFFFFF` | `--branco` | `#ffffff` | Igual |
+| Texto principal | `color.text.primary` `#0F172A` | `--texto` | `#0f172a` | Igual (confirmado no Figma) |
+| Texto secundário | `color.text.secondary` `#475569` | `--texto-suave` | `#5b6b80` | **Difere.** O front ajustou para melhorar o contraste, sem confirmar no Figma |
+| Borda | `color.border.default` `#E2E8F0` | `--borda` | `#e7ecf2` | **Difere** |
+| Sucesso | fundo `#DCFCE7`, texto `#166534` | `--sucesso-bg`, `--sucesso` | `#e8f7ee`, `#15803d` | **Difere** |
+| Alerta | fundo `#FEF9C3`, texto `#854D0E` | `--alerta-bg`, `--alerta` | `#fff4e0`, `#b45309` | **Difere** |
+| Erro | fundo `#FEE2E2`, texto `#991B1B` | `--perigo-bg`, `--perigo` | `#fdeaea`, `#b91c1c` | **Difere** |
+| Informação | fundo `#DBEAFE`, texto `#1E40AF` | sem variável | — | Sem equivalente (o código usa `--azul-claro` `#eff4ff` com `--azul`) |
+| Fonte | Inter | `--fonte-interface` | Inter, com fontes do sistema como alternativa | Igual |
+| Título de página | `font.h1` 32 px / 40 px | `--titulo-tamanho`, `--titulo-entrelinha` | 28 px / 1,25 | **Difere** (28 px confirmado no Figma) |
+| Rótulo de botão | `font.label` 14 px, peso 500 | `--acao-tamanho` | 14 px (peso 600 no Figma) | **Difere** no peso |
+| Padding do conteúdo | múltiplos de 4 px | `--conteudo-padding` | 40 px no desktop; 24 px em 768 e 1024 px; 20 px e 16 px em 320 px | Igual ao Figma |
+| Espaço entre blocos | múltiplos de 4 px | `--conteudo-gap` | 24 px | Igual ao Figma |
+| Raio e sombra | `radius.*`, `shadow.*` | não há variável | valores dentro das regras de cada componente | Sem token |
+
+### 4.1 Contraste das cores do projeto (calculado)
+
+Razão de contraste WCAG calculada a partir dos valores de `tokens.css`. Meta: 4,5:1 para texto normal (RNF-012).
+
+| Combinação | Razão | Resultado |
+|---|---|---|
+| `--texto` sobre `--fundo` | 17,06:1 | Passa |
+| `--texto-suave` sobre branco | 5,44:1 | Passa |
+| `--texto-suave` sobre `--fundo` | 5,20:1 | Passa |
+| Branco sobre `--azul` (botão principal) | 5,17:1 | Passa |
+| `--azul` sobre `--azul-claro` | 4,69:1 | Passa |
+| `--sucesso` sobre `--sucesso-bg` | 4,53:1 | Passa (margem pequena) |
+| `--alerta` sobre `--alerta-bg` | 4,61:1 | Passa (margem pequena) |
+| `--perigo` sobre `--perigo-bg` | 5,59:1 | Passa |
+| `color.text.muted` do Design System (`#94A3B8`) sobre branco | 2,56:1 | **Falha.** Não usar em texto, nem em placeholder |
 
 ---
 
-## 10. Manutenção
+## 5. Estados de interface: padrões e componentes
 
-Atualizar este documento quando: uma tela for implementada (marcar na seção 9), o Design System definir os estados hoje marcados como proposta, o formato de erro da API for confirmado (H-03) ou a paleta oficial for decidida (H-01). Não registrar como implementado o que não foi verificado no código.
+Os componentes de estado **já existem** no `doasync-frontend`. Esta seção descreve o que eles fazem hoje e o que falta, para que as telas novas os reutilizem em vez de criar soluções próprias.
+
+### 5.1 Componentes e hooks existentes (Implementado)
+
+| Estado | Componente ou hook | Comportamento verificado |
+|---|---|---|
+| Loading | `Loading` | Texto "Carregando..." (ou outro, por `message`) com `role="status"` e `aria-live="polite"` |
+| Erro de carga | `ErrorMessage` | Mensagem com `role="alert"` e botão "Tentar novamente" (quando recebe `onRetry`) |
+| Erro ou aviso em formulário | `Aviso` (`erro`) | `role="alert"` quando é erro e `role="status"` quando é informação; ícone `!` ou `ⓘ` |
+| Vazio de página ou bloco | `Vazio` | Ícone, título (`h1` se `principal`, senão `h2`) e texto de apoio. Título padrão "Nenhum resultado encontrado" |
+| Vazio de tabela | `DataTable` (`vazio`) | Parágrafo com `role="status"`. Texto padrão "Nenhum registro encontrado." |
+| Orquestração de carga | `RequestState` + `useRequest` | Mostra loading, erro, vazio ou o conteúdo. Se um "tentar novamente" falha mas há dados, **mantém o conteúdo** e mostra o erro acima |
+| Sucesso de ação | `Toast` | `role="status"` com botão "Dispensar aviso". **Não fecha sozinho** |
+| Confirmação e detalhe | `Modal` | Diálogo nativo `<dialog>`, fecha com `Escape` |
+| Situação (status) | `StatusBadge` | Tons `sucesso`, `alerta`, `perigo` e `neutro` por texto do status |
+| Ação em andamento | `useAsyncAction` | Expõe `pending`, `success`, `error`; **ignora cliques duplicados** com uma trava interna |
+| Progresso | `Progresso` | `role="progressbar"` com `aria-valuenow`, `aria-valuemin` e `aria-valuemax` |
+| Erro de rede | `normalizeError` (`services/api.js`) | Converte o erro do Axios em `{ status, message, data, cancelled }`. Mensagens fixas: "Não foi possível conectar ao servidor." e "Tempo de resposta esgotado." |
+
+### 5.2 Lacunas verificadas no código
+
+| # | Lacuna | Referência |
+|---|---|---|
+| 1 | **Não há skeleton nem spinner.** O loading é só texto. O CSS não define animação de carga | QA §4.3 pede skeleton de cards e botão com spinner |
+| 2 | **`useAsyncAction` não é usado por nenhuma página.** Hoje só `Campanhas`, `Doacoes` e `Entidades` usam `RequestState` | QA §4.3 exige bloquear duplo clique em todo envio (RNF-008) |
+| 3 | **`Toast` não fecha sozinho**, enquanto o Design System define 4 segundos | DS §7.8 |
+| 4 | **Não há tratamento por código HTTP.** `normalizeError` só repassa `status` e `message`. Não existe redirecionamento em 401 nem tela de acesso negado em 403 | QA §4.2 (seção 6 abaixo) |
+| 5 | **O formato de erro não bate com o contrato.** `normalizeError` lê `data.message`, mas a API devolve `{ "error": "..." }` e `{ "erros": { "campo": "..." } }`. Resultado: o texto de um 401 ou 409 não aparece (a tela mostra "Erro 401 ao processar a requisição.") e os erros por campo do 422 se perdem | `rotas-api.md` |
+| 6 | **Não há aviso de perda de conexão** nem salvamento local dos formulários | QA §4.2 |
+| 7 | **As telas rodam com dados de demonstração.** Por isso, loading e erro de rede praticamente não aparecem hoje. Eles passam a valer quando as telas forem ligadas à API | `web/README.md` do front |
+
+### 5.3 Comportamento padrão por estado
+
+| Estado | Regra | Tipo |
+|---|---|---|
+| Botão enviando | Trocar o texto pelo verbo no gerúndio com reticências (ex.: "Publicando...") e **desabilitar o botão** para impedir envio duplicado | Oficial (QA §4.3) |
+| Lista carregando | Skeleton com o mesmo formato do conteúdo final (mesma altura de card), sem salto de layout | Oficial (QA §4.3), não implementado |
+| Carga muito rápida | Só mostrar o skeleton se a resposta passar de 300 ms | Proposta |
+| Carga demorada | Após 10 s, manter o indicador e mostrar "Isso está demorando mais que o normal..." com "Tentar novamente" | Proposta |
+| Vazio absoluto | Explicar o que fazer e, se houver, uma ação ("Você ainda não fez nenhuma doação" + "Explore as campanhas...") | Implementado em parte |
+| Vazio por filtro | "Nenhum resultado" com opção de limpar filtros. Diferente do vazio absoluto | Proposta |
+| Erro de campo (422) | Borda vermelha no campo e texto explicativo abaixo (`font.caption`), com `aria-invalid` e `aria-describedby` | Oficial (QA §4.2) |
+| Erro de página ou lista | `ErrorMessage` com "Tentar novamente", mantendo o cabeçalho da página | Implementado |
+| Sucesso de ação simples | `Toast`. Sucesso que encerra um fluxo (doação) usa tela própria | Implementado |
+| Botão desabilitado | Opacidade 50% e `cursor-not-allowed`. Informar o **motivo** em texto, pois o botão desabilitado não recebe foco | Oficial (DS §7.1) |
+| Foco | Nunca remover o contorno de foco. O CSS já define `:focus-visible` | Implementado |
+| Cor | Nunca usar só cor: sempre ícone ou texto junto (DS §9) | Oficial |
+
+---
+
+## 6. Mensagens padrão por código HTTP
+
+Critério da issue: mensagem padrão para 401, 403, 404, 409, 422 e 500. A coluna **Fonte** indica de onde vem o comportamento. O comportamento de 401, 403, 409, 422 e 500 é o definido pelo QA (§4.2). O 404 não está no relatório de QA e segue o padrão que o código já usa.
+
+| Código | Quando acontece | Comportamento na interface | Mensagem padrão | Fonte | Implementado hoje? |
+|---|---|---|---|---|---|
+| **401** | Token ausente, inválido ou expirado; usuário inativo | Redirecionar **imediatamente** para o login, com aviso informativo. Depois do login, voltar à tela de origem | "Sua sessão expirou. Faça login novamente." | QA §4.2 | Não |
+| **403** | Perfil sem permissão para o recurso | Tela de erro de permissão, **sem deslogar** o usuário, com botão para voltar ao início | "Você não tem permissão para acessar esta página." | Comportamento: QA §4.2. Texto: proposta | Não |
+| **404** | Recurso inexistente ou não visível ao usuário | `Vazio` principal com título do recurso e link de retorno | "Página não encontrada" (rota inexistente). "Campanha não encontrada" ou "Doação não encontrada" (registro), com o texto "Verifique o endereço ou volte para a lista de campanhas." | Padrão já usado no código | **Sim**, para rota inexistente e para campanha ou doação não encontrada |
+| **409** | Duplicidade ou estado inválido (ex.: campanha já encerrada, CNPJ já cadastrado) | Banner de aviso **contextual** (`Aviso` de erro) no formulário ou na tela, e erro no campo quando o conflito é de um campo | "Esta campanha já foi encerrada e não aceita novas doações." / "CNPJ já cadastrado." | QA §4.2 | Não |
+| **422** | Validação de campos | **Borda vermelha** no campo e texto explicativo abaixo. Mover o foco para o primeiro campo com erro | Mensagem do campo vinda da API (`erros.campo`) | QA §4.2 | Não (as telas validam no front, sem usar `erros`) |
+| **500** | Falha inesperada no servidor | **Modal centralizado** com a mensagem. **Nunca** exibir stack trace ou texto técnico (RNF-011) | "Desculpe, ocorreu uma instabilidade em nossos servidores. Nossa equipe já foi notificada." | QA §4.2 | Não |
+| **Sem resposta** | Servidor fora do ar ou sem rede | `ErrorMessage` com "Tentar novamente" | "Não foi possível conectar ao servidor." | `normalizeError` | **Sim** (texto) |
+| **Timeout** | Passou de 15 s | `ErrorMessage` com "Tentar novamente" | "Tempo de resposta esgotado." | `normalizeError` | **Sim** (texto) |
+| **Timeout do PIX** | Gateway demora mais de 10 s para gerar o QR Code | Não travar a tela. Mostrar o aviso com "Tentar novamente" | "Instabilidade no serviço de pagamentos." | QA §4.2 | Não (PIX é simulado) |
+| **Offline** | Conexão cai durante wizard ou checkout | Barra no topo e salvamento local do que foi preenchido | "Você está offline. Suas alterações foram salvas localmente." | QA §4.2 | Não |
+
+> ⚠️ **Atenção ao texto do 500.** A frase "Nossa equipe já foi notificada" só deve ser exibida **se existir uma notificação real** (log ou alerta de erros, RNF-029). Caso contrário, use apenas a primeira frase.
+
+### 6.1 Formato do erro que a interface deve ler
+
+Contrato documentado em [`rotas-api.md`](../backend/rotas-api.md):
+
+| Situação | Corpo da resposta |
+|---|---|
+| 400, 401, 403, 404, 500 e alguns 409 | `{ "error": "mensagem" }` |
+| 422 e alguns 409 | `{ "erros": { "campo": "mensagem" } }` |
+
+Para a tabela acima funcionar, `normalizeError` precisa ler `data.error` e `data.erros`, além de `data.message`. Isso é a pendência D-03.
