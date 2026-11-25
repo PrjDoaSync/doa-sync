@@ -62,6 +62,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | Documento | Assunto | Dono | Origem |
 |---|---|---|---|
 | [frontend/DESIGN-SYSTEM.md](./frontend/DESIGN-SYSTEM.md) | Design system (tokens, componentes), usado por web e mobile | Front | — |
+| [frontend/handoff-ui-ux-estados.md](./frontend/handoff-ui-ux-estados.md) | Handoff UI/UX: mapa Figma × rotas, tokens, estados (loading, vazio, erro) e mensagens por código HTTP | Documentação | — |
 | [frontend/frontend-web.md](./frontend/frontend-web.md) | Frontend web | Front | `doasync-frontend` |
 | [frontend/frontend-validacao.md](./frontend/frontend-validacao.md) | Validação das telas | Front | `doasync-frontend` |
 | [frontend/frontend-testes-unitarios.md](./frontend/frontend-testes-unitarios.md) | Testes unitários do frontend | Front | `doasync-frontend` |

@@ -221,6 +221,26 @@ A altura dos botões dita o ritmo da interface.
 *   **Alertas (In-page):** Barras fixas na página. Fundo suave + borda esquerda espessa com a cor de status + Ícone + Mensagem.
 *   **Toasts (Flutuantes):** Canto superior ou inferior direito. Fecham sozinhos após 4s.
 
+### 7.9 Estados de Interface (loading, vazio, erro, sucesso)
+
+> **⚠️ PENDENTE DE VALIDAÇÃO**
+
+Toda tela que depende de dados ou de uma ação do usuário deve tratar estes estados. O detalhamento por tela, as mensagens por código HTTP e os componentes já existentes no front estão em [`handoff-ui-ux-estados.md`](./handoff-ui-ux-estados.md).
+
+| Estado | Regra | Acessibilidade |
+| :--- | :--- | :--- |
+| **Loading de lista ou página** | Skeleton com o mesmo formato do conteúdo final (mesma altura de card), sem salto de layout. Só aparece se a resposta passar de 300 ms | Contêiner com `aria-busy="true"` e texto "Carregando..." em `role="status"` |
+| **Loading de botão** | Texto no gerúndio ("Publicando..."), spinner e botão `disabled`. Impede envio duplicado | `aria-busy="true"` no botão |
+| **Vazio** | Ícone, título, texto de apoio e, quando útil, uma ação. Distinguir vazio absoluto ("Você ainda não fez nenhuma doação") de vazio por filtro ("Nenhum resultado" + "Limpar filtros") | Título como `h1` (tela inteira) ou `h2` (bloco); `role="status"` nas tabelas |
+| **Erro de campo** | Borda `border-red-500`, ícone e texto `font.caption` em `feedback.error` abaixo do campo | `aria-invalid="true"` e `aria-describedby` apontando para a mensagem |
+| **Erro de formulário ou de carga** | Alerta in-page (7.8) ou bloco de erro com "Tentar novamente". Mantém o cabeçalho da tela | `role="alert"` |
+| **Erro de servidor (500)** | Modal centralizado com mensagem amigável. Nunca exibir detalhe técnico | Foco movido para o modal |
+| **Sucesso de ação simples** | Toast de sucesso | `role="status"` |
+| **Sucesso que encerra um fluxo** | Tela própria (ex.: confirmação de doação) | Foco movido para o título |
+| **Desabilitado** | `opacity-50` e `cursor-not-allowed`, com o **motivo** em texto próximo | Atributo `disabled` |
+
+> **Toast de erro:** não deve fechar sozinho. O fechamento automático de 4 s vale para toasts de sucesso e informação.
+
 ---
 
 ## 8. Layout e Montagem de Páginas
@@ -254,6 +274,8 @@ O projeto lida com doadores e impacto social, a acessibilidade é inegociável[c
 > **PADRÃO RECOMENDADO**
 
 Desenvolvedores da plataforma Web e Mobile[cite: 1] devem mapear estes tokens na configuração dos frameworks.
+
+> **Nota de implementação (DOC-12).** O front Web vigente (`doasync-frontend`, pasta `web/`) usa **React + Vite com CSS próprio**: os tokens ficam em `web/src/styles/tokens.css`, e **não há Tailwind** nem Phosphor Icons (os ícones são SVG próprios). Vários valores diferem deste documento (cores de feedback, texto secundário, borda, título de 28 px e peso 600 no botão). A tabela de correspondência está em [`handoff-ui-ux-estados.md`](./handoff-ui-ux-estados.md), seção 4. A decisão sobre qual das duas fontes prevalece está pendente (item D-07 do mesmo documento).
 
 ### Web (React + Tailwind)
 Tudo definido acima deve ser configurado no `tailwind.config.js`. **Não crie CSS inline arbitrários.**
