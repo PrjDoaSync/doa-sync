@@ -33,6 +33,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 |---|---|---|
 | [DER.png](./DER.png) | Diagrama entidade-relacionamento, **fonte única do modelo** | Coordenação |
 | [entidades-envolvidas.md](./entidades-envolvidas.md) | Descrição das entidades | Coordenação |
+| [modelo-de-dados.md](./modelo-de-dados.md) | Modelo do banco real: dicionário de dados, constraints e divergências com as modelagens antigas | Documentação |
 | [arquitetura.md](./arquitetura.md) | Arquitetura da aplicação | Back |
 | [stack.md](./stack.md) | Stack tecnológica e justificativas | Back |
 
