@@ -15,7 +15,7 @@
 | ⚠️ **A confirmar** | Campo, mensagem ou regra com dúvida aberta — ver coluna de observações |
 | 🚫 **Fora do MVP** | Rota planejada para sprints futuras; sem contrato detalhado aqui |
 
-> **Verificação do status:** o repositório `doasync-backend` é privado. As marcações ✅/🔧 foram inferidas do [`routes-plan.md`](../routes-plan.md) §5 e §11 (rotas portadas do módulo Next.js vs. rotas novas). Quando a API estiver disponível no Swagger (`/swagger-ui.html`), este documento deve ser revisado e os status confirmados.
+> **Verificação do status:** conferido no código do `doasync-backend` (branch `main`, 25/11/2026), controllers `AuthController`, `DoadorController`, `UsuarioMeController`, `DoacaoController`, `EntidadeCadastroController`, `EntidadeConsultaController`, `EntidadeEdicaoController`, `EntidadeStatusController`, `CampanhaController` (vitrine), `CampanhaEscritaController`, `DashboardController`, `UsuarioAdminController` e `UsuarioStatusController`. As 22 rotas do MVP estão implementadas. O contrato mantido pelo backend fica em `doasync-backend/docs/api-contract.md`; em caso de divergência, vale o código.
 
 ---
 
@@ -26,29 +26,29 @@
 | 1 | POST | [`/api/v1/auth/login`](#1-post-apiv1authlogin) | Público | ✅ Implementada | RF03, RF06 |
 | 2 | POST | [`/api/v1/doadores`](#2-post-apiv1doadores) | Público | ✅ Implementada | RF01 |
 | 3 | GET | [`/api/v1/usuarios/me`](#3-get-apiv1usuariosme) | Autenticado | ✅ Implementada | RF05 |
-| 4 | PATCH | [`/api/v1/usuarios/me`](#4-patch-apiv1usuariosme) | Autenticado | 🔧 Planejada | RF05 |
-| 5 | GET | [`/api/v1/usuarios/me/doacoes`](#5-get-apiv1usuariosmedoacoes) | Doador (PF/PJ) | 🔧 Planejada | RF21 |
+| 4 | PATCH | [`/api/v1/usuarios/me`](#4-patch-apiv1usuariosme) | Autenticado | ✅ Implementada | RF05 |
+| 5 | GET | [`/api/v1/usuarios/me/doacoes`](#5-get-apiv1usuariosmedoacoes) | Doador (PF/PJ) | ✅ Implementada | RF21 |
 | 6 | GET | [`/api/v1/entidades`](#6-get-apiv1entidades) | Público | ✅ Implementada | RF08, RF26 |
 | 7 | POST | [`/api/v1/entidades`](#7-post-apiv1entidades) | Público | ✅ Implementada | RF02 |
 | 8 | GET | [`/api/v1/entidades/{id}`](#8-get-apiv1entidadesid) | Público* | ✅ Implementada | RF08 |
 | 9 | PATCH | [`/api/v1/entidades/{id}`](#9-patch-apiv1entidadesid) | Dono ou ADMIN | ✅ Implementada | RF07 |
 | 10 | PATCH | [`/api/v1/entidades/{id}/status`](#10-patch-apiv1entidadesidstatus) | ADMIN | ✅ Implementada | RF09, RF10 |
-| 11 | GET | [`/api/v1/entidades/{id}/doacoes`](#11-get-apiv1entidadesiddoacoes) | Dono ou ADMIN | 🔧 Planejada | RF22 |
-| 12 | GET | [`/api/v1/entidades/{id}/arrecadacao`](#12-get-apiv1entidadesidarrecadacao) | Dono ou ADMIN | 🔧 Planejada | RF23 |
-| 13 | GET | [`/api/v1/campanhas`](#13-get-apiv1campanhas) | Público | 🔧 Planejada | RF12, RF14 |
-| 14 | GET | [`/api/v1/campanhas/{id}`](#14-get-apiv1campanhasid) | Público* | 🔧 Planejada | RF14 |
-| 15 | POST | [`/api/v1/campanhas`](#15-post-apiv1campanhas) | ENTIDADE aprovada | 🔧 Planejada | RF11 |
-| 16 | PATCH | [`/api/v1/campanhas/{id}`](#16-patch-apiv1campanhasid) | Entidade dona | 🔧 Planejada | RF11 (Equipe 2) |
-| 17 | PATCH | [`/api/v1/campanhas/{id}/status`](#17-patch-apiv1campanhasidstatus) | Dono / ADMIN | 🔧 Planejada | RF13, RF15 |
-| 18 | POST | [`/api/v1/doacoes`](#18-post-apiv1doacoes) | Doador (PF/PJ) | 🔧 Planejada | RF16–RF20, RNF11 |
-| 19 | GET | [`/api/v1/doacoes/{id}`](#19-get-apiv1doacoesid) | Doador / Entidade / ADMIN | 🔧 Planejada | RF18 |
-| 20 | GET | [`/api/v1/dashboard/kpis`](#20-get-apiv1dashboardkpis) | ADMIN | 🔧 Planejada | RF24, RF25 |
-| 21 | GET | [`/api/v1/usuarios`](#21-get-apiv1usuarios) | ADMIN | 🔧 Planejada | RF26 |
-| 22 | PATCH | [`/api/v1/usuarios/{id}/status`](#22-patch-apiv1usuariosidstatus) | ADMIN | 🔧 Planejada | RF26 |
+| 11 | GET | [`/api/v1/entidades/{id}/doacoes`](#11-get-apiv1entidadesiddoacoes) | Dono ou ADMIN | ✅ Implementada | RF22 |
+| 12 | GET | [`/api/v1/entidades/{id}/arrecadacao`](#12-get-apiv1entidadesidarrecadacao) | Dono ou ADMIN | ✅ Implementada | RF23 |
+| 13 | GET | [`/api/v1/campanhas`](#13-get-apiv1campanhas) | Público | ✅ Implementada | RF12, RF14 |
+| 14 | GET | [`/api/v1/campanhas/{id}`](#14-get-apiv1campanhasid) | Público* | ✅ Implementada | RF14 |
+| 15 | POST | [`/api/v1/campanhas`](#15-post-apiv1campanhas) | ENTIDADE aprovada | ✅ Implementada | RF11 |
+| 16 | PATCH | [`/api/v1/campanhas/{id}`](#16-patch-apiv1campanhasid) | Entidade dona | ✅ Implementada | RF11 (Equipe 2) |
+| 17 | PATCH | [`/api/v1/campanhas/{id}/status`](#17-patch-apiv1campanhasidstatus) | Dono / ADMIN | ✅ Implementada | RF13, RF15 |
+| 18 | POST | [`/api/v1/doacoes`](#18-post-apiv1doacoes) | Doador (PF/PJ) | ✅ Implementada | RF16–RF20, RNF11 |
+| 19 | GET | [`/api/v1/doacoes/{id}`](#19-get-apiv1doacoesid) | Doador / Entidade / ADMIN | ✅ Implementada | RF18 |
+| 20 | GET | [`/api/v1/dashboard/kpis`](#20-get-apiv1dashboardkpis) | ADMIN | ✅ Implementada | RF24, RF25 |
+| 21 | GET | [`/api/v1/usuarios`](#21-get-apiv1usuarios) | ADMIN | ✅ Implementada | RF26 |
+| 22 | PATCH | [`/api/v1/usuarios/{id}/status`](#22-patch-apiv1usuariosidstatus) | ADMIN | ✅ Implementada | RF26 |
 
 \* Recursos não aprovados/desativados só são visíveis para o dono e o ADMIN.
 
-> **Status das rotas de Entidade (6–10) como ✅:** estas rotas foram portadas do módulo Next.js (`cadastro-entidades`) para o Spring Boot, conforme [`routes-plan.md`](../routes-plan.md) §11. As rotas de Auth (1–3) fazem parte do Fluxo F0–F1 implementado na mesma branch. Todas as demais são novas e planejadas (§12).
+> **Status das rotas:** conferido no código do `doasync-backend` (`main`). Entidade (6–10): `EntidadeCadastroController`, `EntidadeConsultaController`, `EntidadeEdicaoController` e `EntidadeStatusController`. Auth e usuário (1–5): `AuthController`, `DoadorController`, `UsuarioMeController` e `DoacaoController`. Doações (11, 12, 18, 19): `DoacaoController`. Campanhas (13–17): `CampanhaController` e `CampanhaEscritaController`. Admin (20–22): `DashboardController`, `UsuarioAdminController` e `UsuarioStatusController`.
 
 ---
 
@@ -263,7 +263,7 @@ Perfil do usuário autenticado.
 
 ---
 
-### 4. `PATCH /api/v1/usuarios/me` 🔧
+### 4. `PATCH /api/v1/usuarios/me` ✅
 
 Edição do próprio perfil. Todos os campos são opcionais; campo ausente não é alterado.
 E-mail, tipo, CPF e CNPJ **não são editáveis**. Dados institucionais de entidade são editados na rota 9.
@@ -299,7 +299,7 @@ E-mail, tipo, CPF e CNPJ **não são editáveis**. Dados institucionais de entid
 
 ---
 
-### 5. `GET /api/v1/usuarios/me/doacoes` 🔧
+### 5. `GET /api/v1/usuarios/me/doacoes` ✅
 
 Histórico de doações do doador autenticado, mais recentes primeiro.
 
@@ -380,28 +380,18 @@ Histórico de doações do doador autenticado, mais recentes primeiro.
 
 ### 6. `GET /api/v1/entidades` ✅
 
-Diretório público de entidades e painel do admin.
+Diretório público de entidades: lista somente as entidades `APROVADA`.
 
 **Perfil de acesso:** público (token opcional)
 
-**Query**
+**Query:** nenhuma. A rota não tem paginação, busca nem filtro de status (`EntidadeConsultaController.listar()`).
 
-| Parâmetro | Tipo | Padrão | Descrição |
-|---|---|---|---|
-| `page` | number | `1` | Página |
-| `limit` | number | `10` | Itens por página (máx. 50) |
-| `busca` | string | — | Razão social, nome fantasia ou área de atuação |
-| `status` | string | `APROVADA` | **Somente ADMIN**; demais sempre veem `APROVADA` |
-
-**Response `200`**
+**Response `200`** (`ApiResposta<List<EntidadeResposta>>`, sem `meta`)
 ```json
 {
-  "data": [ { "id": "a1b2c3d4-...", "razaoSocial": "Associação Amor Inclusivo", "statusAprovacao": "APROVADA" } ],
-  "meta": { "total": 1, "page": 1, "limit": 10, "totalPages": 1 }
+  "data": [ { "id": "a1b2c3d4-...", "razaoSocial": "Associação Amor Inclusivo", "statusAprovacao": "APROVADA" } ]
 }
 ```
-
-**Erros:** `422 { "erros": { "status": "Status inválido. Use: PENDENTE, APROVADA, REPROVADA, INATIVA" } }` (admin com valor inválido)
 
 ---
 
@@ -561,7 +551,10 @@ Aprovar, reprovar, desativar ou recolocar como pendente.
 }
 ```
 
-**Regras:** `APROVADA` grava `dataAprovacao` e `aprovadoPorId`; demais status limpam `motivoReprovacao`.
+**Regras:**
+- `APROVADA` grava `dataAprovacao` e `aprovadoPorId`; demais status limpam `motivoReprovacao`.
+- `INATIVA` encerra automaticamente as campanhas `ATIVA` e `AGENDADA` da entidade (RN55).
+- `motivo` aceita no máximo 1000 caracteres (`Motivo deve ter no máximo 1000 caracteres.`, 422).
 
 **Erros**
 ```json
@@ -574,7 +567,7 @@ Aprovar, reprovar, desativar ou recolocar como pendente.
 
 ---
 
-### 11. `GET /api/v1/entidades/{id}/doacoes` 🔧
+### 11. `GET /api/v1/entidades/{id}/doacoes` ✅
 
 Doações recebidas pela entidade, opcionalmente filtradas por campanha.
 
@@ -610,7 +603,7 @@ Doações recebidas pela entidade, opcionalmente filtradas por campanha.
 
 ---
 
-### 12. `GET /api/v1/entidades/{id}/arrecadacao` 🔧
+### 12. `GET /api/v1/entidades/{id}/arrecadacao` ✅
 
 Total arrecadado pela entidade em um período, por campanha.
 
@@ -659,6 +652,7 @@ Total arrecadado pela entidade em um período, por campanha.
   "id": "b2a1c3d4-6e7f-4a8b-9c0d-1e2f3a4b5c6d",
   "titulo": "Cadeiras de rodas",
   "descricao": "Compra de 5 cadeiras de rodas para os assistidos.",
+  "categoria": "Saúde",
   "metaValor": 1000.00,
   "valorArrecadado": 250.00,
   "percentualAtingido": 25.00,
@@ -666,6 +660,7 @@ Total arrecadado pela entidade em um período, por campanha.
   "dataFim": "2026-11-06",
   "status": "ATIVA",
   "recebendoDoacoes": true,
+  "imagemUrl": "https://cdn.exemplo.com/cadeiras.jpg",
   "motivoDesativacao": null,
   "entidade": { "id": "a1b2c3d4-...", "razaoSocial": "Associação Amor Inclusivo", "nomeFantasia": "Amor Inclusivo" },
   "createdAt": "2026-10-07T22:10:00Z",
@@ -675,17 +670,17 @@ Total arrecadado pela entidade em um período, por campanha.
 
 | Campo | Descrição |
 |---|---|
-| `status` | `ATIVA` · `ENCERRADA` (pela entidade — estado final) · `DESATIVADA` (pelo admin — reversível) |
+| `status` | `RASCUNHO` · `AGENDADA` (início no futuro) · `ATIVA` · `ENCERRADA` (pela entidade — estado final) · `DESATIVADA` (pelo admin — reversível). Fonte: enum `StatusCampanha`. Ciclo: `RASCUNHO → AGENDADA → ATIVA → ENCERRADA \| DESATIVADA` (RN59) |
 | `recebendoDoacoes` | `true` quando `ATIVA` + hoje ∈ [`dataInicio`, `dataFim`] + entidade `APROVADA` |
 | `valorArrecadado` / `percentualAtingido` | Soma das doações `CONFIRMADA` |
+| `categoria` | Texto livre, opcional, até 200 caracteres. Não há taxonomia nem filtro por categoria (fora do MVP) |
+| `imagemUrl` | Link externo opcional, até 2.048 caracteres. Não há upload de imagem (RF-018 fora do MVP) |
 
-⚠️ **A confirmar:** campo de imagem não existe no objeto atual. Requisito `requisitos.md` menciona imagens; verificar com Backend se será adicionado (CT-CAM-27, CT-CAM-30).
-
-⚠️ **A confirmar:** `requisitos.md` menciona status "rascunho" na criação, mas o contrato atual cria a campanha diretamente como `ATIVA`. Verificar se a rota de publicação será criada (CT-CAM-37, CT-CAM-42).
+**Status inicial na criação** (calculado no servidor): `rascunho: true` → `RASCUNHO`; `dataInicio` no futuro → `AGENDADA`; caso contrário → `ATIVA`. Não há rota de publicação separada: a campanha sai de `RASCUNHO` por `PATCH /campanhas/{id}/status` (rota 17) ou pela rotina diária que atualiza o status pelas datas (RN59, RN60).
 
 ---
 
-### 13. `GET /api/v1/campanhas` 🔧
+### 13. `GET /api/v1/campanhas` ✅
 
 Vitrine de campanhas ativas com progresso.
 
@@ -696,9 +691,9 @@ Vitrine de campanhas ativas com progresso.
 | Parâmetro | Descrição |
 |---|---|
 | `page`, `limit` | Paginação (padrão: `page=1`, `limit=10`, máx. 50) |
-| `busca` | Trecho do título |
+| `busca` | Termo buscado no **título** (sem diferenciar maiúsculas, até 200 caracteres; `%`, `_` e `!` são tratados como texto). Vem de `Paginacao` |
 | `entidadeId` | Campanhas de uma entidade específica |
-| `status` | `ATIVA` · `ENCERRADA` · `DESATIVADA` — **somente ADMIN ou entidade dona com seu próprio `entidadeId`**; para os demais o filtro é ignorado e só aparecem campanhas `recebendoDoacoes: true` |
+| `status` | `AGENDADA` · `ATIVA` · `ENCERRADA` · `DESATIVADA` — **somente ADMIN ou entidade dona com seu próprio `entidadeId`**; para os demais o filtro é ignorado e só aparecem campanhas `recebendoDoacoes: true`. `RASCUNHO` nunca aparece na vitrine |
 
 **Response `200`**
 ```json
@@ -719,11 +714,11 @@ Vitrine de campanhas ativas com progresso.
 }
 ```
 
-**Erros:** `422 { "erros": { "status": "Status inválido. Use: ATIVA, ENCERRADA, DESATIVADA" } }` (admin com valor inválido) ⚠️ a confirmar (CT-CAM-108)
+**Erros:** `422 { "erros": { "status": "Status inválido. Use: RASCUNHO, AGENDADA, ATIVA, ENCERRADA, DESATIVADA" } }` (ADMIN ou entidade dona com valor inválido; mensagem de `CampanhaVitrineService`) (CT-CAM-108)
 
 ---
 
-### 14. `GET /api/v1/campanhas/{id}` 🔧
+### 14. `GET /api/v1/campanhas/{id}` ✅
 
 Detalhe da campanha com progresso.
 
@@ -738,7 +733,7 @@ Detalhe da campanha com progresso.
 
 ---
 
-### 15. `POST /api/v1/campanhas` 🔧
+### 15. `POST /api/v1/campanhas` ✅
 
 Cria campanha de arrecadação para a entidade do usuário autenticado.
 
@@ -790,7 +785,7 @@ Cria campanha de arrecadação para a entidade do usuário autenticado.
 
 ---
 
-### 16. `PATCH /api/v1/campanhas/{id}` 🔧
+### 16. `PATCH /api/v1/campanhas/{id}` ✅
 
 Edita campanha `ATIVA`. Todos os campos são opcionais.
 
@@ -828,7 +823,7 @@ Edita campanha `ATIVA`. Todos os campos são opcionais.
 
 ---
 
-### 17. `PATCH /api/v1/campanhas/{id}/status` 🔧
+### 17. `PATCH /api/v1/campanhas/{id}/status` ✅
 
 Encerrar antes do prazo (RF13) ou desativar/reativar por violação de políticas (RF15).
 
@@ -849,6 +844,8 @@ Encerrar antes do prazo (RF13) ou desativar/reativar por violação de política
 | ADMIN | `ATIVA → DESATIVADA` (motivo obrigatório) | `Campanha desativada.` |
 | ADMIN | `DESATIVADA → ATIVA` | `Campanha reativada.` |
 
+O campo `status` aceita os 5 valores de `StatusCampanha` (`RASCUNHO`, `AGENDADA`, `ATIVA`, `ENCERRADA`, `DESATIVADA`), respeitando o ciclo `RASCUNHO → AGENDADA → ATIVA → ENCERRADA | DESATIVADA` (RN59). Transição fora do ciclo → `409`. `motivo` aceita no máximo 1000 caracteres.
+
 **Response `200`**
 ```json
 {
@@ -863,7 +860,7 @@ Encerrar antes do prazo (RF13) ou desativar/reativar por violação de política
 { "error": "Campanha encerrada não pode ser alterada." }     // 409
 { "error": "A campanha já está com este status." }           // 409
 { "error": "Campanha desativada pelo administrador." }       // 409 ⚠️ a confirmar: qual transição (CT-CAM-26, CT-CAM-55)
-{ "erros": { "status": "Status inválido. Use: ATIVA, ENCERRADA, DESATIVADA" } } // 422
+{ "erros": { "status": "Status inválido." } } // 422
 { "erros": { "motivo": "Motivo da desativação é obrigatório." } } // 422
 ```
 `401` · `404` ⚠️ a confirmar (CT-CAM-50, CT-CAM-62)
@@ -894,7 +891,7 @@ Encerrar antes do prazo (RF13) ou desativar/reativar por violação de política
 
 ---
 
-### 18. `POST /api/v1/doacoes` 🔧
+### 18. `POST /api/v1/doacoes` ✅
 
 Realiza doação para uma campanha **ou** diretamente para uma entidade.
 
@@ -935,11 +932,11 @@ Idempotency-Key: 6b1f0c1e-pedido-123   (opcional, recomendado — RNF11)
 }
 ```
 
-**Response `200`** — repetição com o mesmo `Idempotency-Key` (sem duplicar — RNF11):
+**Response `200`** — repetição com o mesmo `Idempotency-Key`: devolve a doação já criada, sem duplicar (RNF11):
 ```json
 {
-  "message": "Doação já registrada.",
-  "data": { "id": "8d0e6c1a-...", "status": "CONFIRMADA" }
+  "message": "Doação recuperada com sucesso.",
+  "data": { "id": "8d0e6c1a-...", "codigoComprovante": "DS-7F3A9C21B0E4", "status": "CONFIRMADA" }
 }
 ```
 
@@ -965,7 +962,7 @@ Idempotency-Key: 6b1f0c1e-pedido-123   (opcional, recomendado — RNF11)
 
 ---
 
-### 19. `GET /api/v1/doacoes/{id}` 🔧
+### 19. `GET /api/v1/doacoes/{id}` ✅
 
 Comprovante de uma doação.
 
@@ -984,7 +981,7 @@ Comprovante de uma doação.
 
 ---
 
-### 20. `GET /api/v1/dashboard/kpis` 🔧
+### 20. `GET /api/v1/dashboard/kpis` ✅
 
 Indicadores gerais da plataforma.
 
@@ -1022,7 +1019,7 @@ Indicadores gerais da plataforma.
 
 ---
 
-### 21. `GET /api/v1/usuarios` 🔧
+### 21. `GET /api/v1/usuarios` ✅
 
 Lista usuários para gestão administrativa.
 
@@ -1058,7 +1055,7 @@ Lista usuários para gestão administrativa.
 
 ---
 
-### 22. `PATCH /api/v1/usuarios/{id}/status` 🔧
+### 22. `PATCH /api/v1/usuarios/{id}/status` ✅
 
 Ativa ou desativa uma conta. Usuário `INATIVO` não faz login e perde acesso mesmo com token ainda válido.
 
@@ -1106,14 +1103,25 @@ Dependem de decisões ou módulos ainda inexistentes — ver [`routes-plan.md`](
 
 ---
 
+## Rotas legadas
+
+| Rota | Controller | Observação |
+|---|---|---|
+| `GET /api/campanhas` | `CampanhaReadController` | Alias legado da consulta da Equipe 2, **sem `/v1`**. Só sobe com o perfil Spring `consulta` (`@Profile("consulta")`). Query: `page` (padrão 1), `limit` (padrão 10), `busca`, `entidadeId`. Somente leitura |
+| `GET /api/campanhas/{id}` | `CampanhaReadController` | Mesmo alias e perfil |
+
+Clientes novos devem usar `GET /api/v1/campanhas` e `GET /api/v1/campanhas/{id}` (rotas 13 e 14).
+
+---
+
 ## Coleção Postman
 
 | Coleção | Localização | Estado |
 |---|---|---|
-| **DoaSync API** (QA — US-01 Dashboard) | Workspace Postman "Projeto de Extensão - Doasync" · `quality/docs/backend/doasync-api-tests` | 4 endpoints mock (Dashboard); dados fictícios; ⚠️ campos a confirmar com Backend |
-| **doasync-backend** (Backend) | Repositório `doasync-backend` (privado) | Desconhecida — verificar com Equipe 2/Backend |
+| **DoaSync Campanhas** (Backend) — **oficial** | `doasync-backend/docs/postman/DoaSync-Campanhas.postman_collection.json` | Coleção oficial do contrato, mantida com o código |
+| **DoaSync API** (QA) — legado de mock | `quality/docs/backend/postman/doasync-api.postman_collection.json` | 4 requisições de mock; 3 delas são de rotas fora do MVP. Usar só como referência histórica |
 
-> **Coleção oficial unificada — pendente:** uma coleção Postman cobrindo todas as 22 rotas deste contrato, com variável `{{baseUrl}}` parametrizada, ainda não existe. As duas coleções acima têm escopos parciais e dados fictícios. A criação da coleção oficial é o próximo passo após a confirmação das dúvidas listadas em [`cenarios-testes-api.md`](./cenarios-testes-api.md) §Dúvidas para o Backend.
+> A coleção oficial é a do backend. Rotas deste contrato que ainda não estiverem nela devem ser acrescentadas lá, e não na coleção do QA.
 
 ---
 
@@ -1124,11 +1132,11 @@ As dúvidas completas estão em [`cenarios-testes-api.md`](./cenarios-testes-api
 | # | Rota | Dúvida |
 |---|---|---|
 | 1 | `POST /doadores` | Mensagem de CNPJ duplicado (409) |
-| 2 | `POST /campanhas` | Status inicial: `ATIVA` ou `rascunho`? Existirá rota de publicação? |
-| 3 | `GET/POST /campanhas` | Campo de imagem será adicionado ao objeto `Campanha`? |
+| 2 | `POST /campanhas` | ✅ Respondida (`StatusCampanha`): `rascunho: true` cria em `RASCUNHO`; sem rascunho, `AGENDADA` se `dataInicio` for futura, senão `ATIVA`. Não há rota de publicação; a mudança de status é pela rota 17. Ver [Objeto `Campanha`](#objeto-campanha) |
+| 3 | `GET/POST /campanhas` | ✅ Respondida (`CriarCampanhaRequest`, `CampanhaResposta`): `imagemUrl` (link, até 2.048) e `categoria` (texto livre, até 200) já existem e são opcionais. Upload de imagem fica fora do MVP |
 | 4 | `PATCH /campanhas/{id}/status` | Qual transição dispara "Campanha desativada pelo administrador." (409)? |
-| 5 | `GET /api/v1/dashboard/kpis` | Confirmar campos com Equipe 4 e QA |
-| 6 | Todas as rotas de campanha | Numeração dos RFs diverge entre `rotas-api.md` e `requisitos.md` (RF10–RF17 vs. RF11–RF15) |
+| 5 | `GET /api/v1/dashboard/kpis` | ✅ Respondida (`DashboardKpisResposta`): `totalArrecadado`, `valorArrecadadoMes`, `doacoesMes`, `totalDoacoes`, `totalDoadores`, `totalEntidades`, `campanhasAtivas`, `usuariosAtivos`. Ver rota 20 |
+| 6 | Todas as rotas de campanha | ✅ Respondida: a numeração oficial é RF-001–RF-030 de [`requisitos.md`](../requisitos.md). A equivalência com RF01–RF26 está em [`funcionalidades.md`](../funcionalidades.md) |
 
 ---
 
@@ -1140,4 +1148,5 @@ As dúvidas completas estão em [`cenarios-testes-api.md`](./cenarios-testes-api
 | [`../routes-plan.md`](../routes-plan.md) | Status de implementação, decisões arquiteturais, problemas identificados |
 | [`cenarios-testes-api.md`](./cenarios-testes-api.md) | 109 cenários de teste; dúvidas abertas com o Backend |
 | [`relatorio-testes-api-doasync.md`](./relatorio-testes-api-doasync.md) | Coleção Postman existente (US-01 Dashboard, mock em nuvem) |
-| `doasync-backend/docs/api-cam-*` | Repositório privado — não acessível; verificar com Equipe 2 |
+| `doasync-backend/docs/api-contract.md` (`main`, 21/11/2026) | Contrato consolidado mantido pelo backend; fonte dos status de campanha, idempotência e regras de entidade |
+| Código do `doasync-backend` (`main`) | Conferência das 22 rotas, enums (`TipoUsuario`, `StatusDoacao`, `StatusEntidade`, `StatusCampanha`) e `DashboardKpisResposta` |
