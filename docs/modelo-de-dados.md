@@ -355,7 +355,7 @@ Doação financeira de um usuário a uma entidade, com ou sem campanha (RN66, RN
 | V5 | `V5__campanha_status_agendada` (Java) | Inclui o status `AGENDADA` em `campanhas` |
 | V6 | `V6__status_campanha_rascunho.sql` | Inclui o status `RASCUNHO` em `campanhas` |
 
-As migrações V1 a V4 são imutáveis: mudanças no schema entram sempre em uma migração nova.
+Toda migração já aplicada é imutável: mudanças no schema entram sempre em uma migração nova.
 
 ---
 
@@ -389,6 +389,10 @@ O `DER.png` é o desenho vigente do modelo. Quase tudo bate com as migrações. 
 | 6 | Colunas de origem do projeto antigo | Não aparecem | `campanhas.categoria`, `projeto_legado_id`, `usuario_criador_legado_id`, `data_projeto_legado` (migração V4) | Atualizar o DER |
 | 7 | Regras escritas na legenda do DER | "mínimo 18 anos" (`data_nascimento`), "`data_inicio` não pode estar no passado", "endereço obrigatório para entidade, opcional para doador" | **Nenhuma** dessas regras tem `CHECK` ou constraint no banco | Confirmar se o serviço as valida. Não foi verificado neste documento |
 | 8 | Legenda de `usuarios.tipo` | A imagem mostra o texto cortado (`PESSOA_FISICA \| ENTIDADE \| ADMIN…`) | 4 valores, incluindo `PESSOA_JURIDICA` | Refazer a exportação da imagem sem corte |
+| 9 | `entidades.status_aprovacao` | `PENDENTE \| APROVADA \| REPROVADA \| DESATIVA…` (texto cortado) | O quarto valor é **`INATIVA`** | Atualizar o DER |
+| 10 | `entidades.telefone_contato` e `entidades.whatsapp` | Não aparecem | Existem (V1), ambas `VARCHAR(20)` opcionais | Atualizar o DER |
+| 11 | Período da campanha | `data_fim` "maior que data_inicio" | `CHECK (data_fim >= data_inicio)`: aceita campanha de um dia só | Alinhar a regra e atualizar o lado que estiver errado |
+| 12 | Tipos dos campos `text` | `entidades.descricao`, `entidades.motivo_status`, `campanhas.descricao`, `campanhas.motivo_desativacao` e `doacoes.observacao` como `text` | `VARCHAR(n)` com limite: 5000, 1000, 10000, 1000 e 500, respectivamente | Atualizar o DER |
 
 ### 5.2 Modelagem conceitual original (#15) × banco real
 
@@ -396,7 +400,7 @@ Fonte: imagem de modelagem conceitual (modelo entidade-relacionamento) da branch
 
 | Elemento na modelagem conceitual | Banco real |
 |---|---|
-| Especialização total e disjunta de `Usuario` em **Doador**, **Receptor** e **Adm** | Substituída por `usuarios.tipo` (`PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE`, `ADMIN`). "Doador" deixou de ser um tipo: quem doa é qualquer usuário em `doacoes.doador_id`. "Receptor" virou a `ENTIDADE`. `ADMIN` continua |
+| Especialização **(t,c)** — total e compartilhada — de `Usuario` em **Doador**, **Receptor** e **Adm**: um usuário podia ter mais de um papel | Substituída por `usuarios.tipo` (`PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE`, `ADMIN`), com **um único tipo por usuário**: o banco é **disjunto** (ver 2.2). "Doador" deixou de ser um tipo: quem doa é qualquer usuário em `doacoes.doador_id`. "Receptor" virou a `ENTIDADE`. `ADMIN` continua |
 | `Usuario` 1,1 — `Endereço` 1,n | Mantido: `usuarios` 1 : N `enderecos` |
 | `Usuario` 1,1 — `Telefone` 1,n | Mantido: `usuarios` 1 : N `telefones` |
 | Entidade própria **Instituição**, com endereços e telefones próprios | Vira `entidades`, um perfil ligado a um usuário PJ. Endereços e telefones são os do **usuário** dono. A entidade guarda só `email_contato`, `telefone_contato` e `whatsapp` públicos |
