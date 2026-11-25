@@ -4,7 +4,7 @@
 > Responsável: Grupo 5 — Qualidade de Software
 > Semestre: 2026/2
 >
-> **Atualização — Task DOC-08 (#187):** diagrama e tabelas corrigidos para refletir a implementação real. Frontend atualizado de React + Next.js para **React + Vite** (SPA); API Express no `doasync-backend` registrada como componente com situação a definir junto à Equipe 2.
+> **Atualização — Task DOC-08 (#187):** diagrama e tabelas corrigidos para refletir a implementação real. Frontend atualizado de React + Next.js para **React + Vite** (SPA); API Express no `doasync-backend` registrada como a API inicial da Sprint 1 (CAM-T04), com papel futuro a definir junto à Equipe 2.
 
 ---
 
@@ -14,42 +14,44 @@ O DoaSync é uma plataforma web de arrecadação de doações que conecta doador
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        CLIENTES                             │
+│                           CLIENTES                          │
 │                                                             │
 │   ┌───────────────────────────────────────────────────┐     │
 │   │  Web (React 19 + Vite 8)                          │     │
 │   │  React Router 7 · Axios · CSS próprio             │     │
-│   │  Integração com backend: pendente (DemoProvider)  │     │
-│   └──────────────────────────┬────────────────────────┘     │
-└─────────────────────────────-│──────────────────────────────┘
-                               │  HTTPS / REST (JSON)
-                               │  VITE_API_URL → :8080/api
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│              BACK-END — doasync-backend (privado)           │
+│   │  Vitrine (Home, Explorar, Detalhe): API real      │     │
+│   │  Área de gestão: DemoProvider (em memória)        │     │
+│   └─────────────────────────┬─────────────────────────┘     │
+└─────────────────────────────┬───────────────────────────────┘
+                              │  HTTPS / REST (JSON)
+                              │  VITE_API_URL → :8080/api/v1
+                              ▼
+┌─────────────────────────────┴───────────────────────────────┐
+│             BACK-END — doasync-backend (privado)            │
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │  API Spring Boot 4.1.1  (backend oficial)            │   │
-│  │  Java 17 · Maven · /api/v1                           │   │
+│  │  Java 17 · Maven · /api/v1 · Flyway (V1 a V6)        │   │
 │  │                                                      │   │
 │  │  Spring Security (JWT HS256 · Stateless)             │   │
 │  ├──────────┬──────────┬──────────┬──────────┬──────────┤   │
 │  │ usuario  │ entidade │ campanha │  doacao  │dashboard │   │
-│  │ /auth    │          │          │          │ /kpis    │   │
+│  │  /auth   │          │          │          │  /kpis   │   │
 │  ├──────────┴──────────┴──────────┴──────────┴──────────┤   │
-│  │           shared (envelope · erros · paginação)      │   │
-│  └──────────────────────────┬───────────────────────────┘   │
-│                             │  JPA / Hibernate               │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  API Express (Node.js) — situação a definir          │   │
-│  │  Papel: provisório · paralelo · ou descontinuado?    │   │
-│  │  ⚠ Decisão pendente com Equipe 2 (PV-Express)       │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────│───────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       BANCO DE DADOS                        │
+│  │        shared (envelope · erros · paginação)         │   │
+│  └──────────────────────────────────────────────────┬───┘   │
+│  ┌────────────────────────────────────────────┐     │       │
+│  │  API Express (Node.js), Sprint 1 (CAM-T04) │     │       │
+│  │  GET /campanhas · fixtures em memória      │     │       │
+│  │  Sem banco · porta 8080, a mesma do Spring │     │       │
+│  │  Papel futuro: pendente (PV-Express)       │     │       │
+│  └────────────────────────────────────────────┘     │       │
+│                                                     │  JPA  │
+└─────────────────────────────────────────────────────┬───────┘
+                                                      │
+                                                      ▼
+┌─────────────────────────────────────────────────────┴───────┐
+│                        BANCO DE DADOS                       │
 │                                                             │
 │  PostgreSQL (produção / homologação)                        │
 │  H2 in-memory (desenvolvimento e testes — Spring Boot)      │
@@ -67,17 +69,18 @@ O DoaSync é uma plataforma web de arrecadação de doações que conecta doador
 
 | Aspecto | Tecnologia | Versão |
 |---|---|---|
-| Linguagem | JavaScript / JSX | Node.js 24 requerido |
+| Linguagem | JavaScript / JSX | Node.js 24 (`web/README.md`); o CI usa Node.js 22 |
 | Framework Web | React | ^19.3.1 |
 | Bundler / dev server | Vite + `@vitejs/plugin-react` | ^8.3.4 / ^6.1.2 |
 | Roteamento | React Router DOM | ^7.18.4 |
 | HTTP client | Axios | ^1.20.0 |
 | Estilização | CSS próprio (`index.css`) | — |
+| Tipografia | Fonte Inter auto-hospedada (`web/public/fonts`) | — |
 | Lint | oxlint | ^1.88.0 |
-| Testes | Vitest + React Testing Library + jsdom | ^5.0.5 / ^16.3.3 / ^29.1.1 |
+| Testes | Vitest + React Testing Library + `@testing-library/user-event` + jsdom | ^5.0.5 / ^16.3.3 / ^14.6.8 / ^29.1.1 |
 | Design e prototipagem | Figma | — |
 
-O front-end **não acessa o banco diretamente**; todos os dados chegam via chamadas à API REST do back-end (RNF-017). A integração com a API Spring Boot (`VITE_API_URL=http://localhost:8080/api`) está declarada nos services Axios, mas ainda **não foi ativada** — o frontend opera com um `DemoProvider` em memória.
+O front-end **não acessa o banco diretamente**; todos os dados chegam via chamadas à API REST do back-end (RNF-017). A URL base é `VITE_API_URL`, com padrão `http://localhost:8080/api/v1` (`web/.env.example`). Desde o PR #143 do `doasync-frontend` (24/11/2026), a vitrine pública (Home, Explorar e Detalhe da campanha) consome a API Spring Boot pelo hook `useCampanhasPublicas`. A área de gestão ainda usa o `DemoProvider` em memória.
 
 > **Nota:** TypeScript, Next.js (SSR/SSG), Tailwind CSS, React Native e Expo estavam no plano original mas **não estão no repositório atual** (branch `develop`). O escopo mobile permanece planejado, sem implementação neste repositório.
 
@@ -125,7 +128,13 @@ Controller (HTTP · DTO · validação)
 
 ### 2.3 API Express (Node.js) — situação a definir
 
-O repositório `doasync-backend` contém, além da API Spring Boot, uma **API Express (Node.js)**. A relação entre as duas está pendente de alinhamento com a **Equipe 2 (backend de campanhas)**:
+O repositório `doasync-backend` contém, além da API Spring Boot, uma **API Express (Node.js)** em `backend/src/server.js`. Ela é a API executável inicial do módulo de Campanhas, entregue pela Equipe 2 na Sprint 1 (task CAM-T04):
+
+- expõe só `GET /api/v1/health`, `GET /api/v1/campanhas` e `GET /api/v1/campanhas/:id`;
+- lê **fixtures em memória** (`backend/src/data/fixtures.js`) e **não acessa banco**;
+- roda na **porta 8080**, a mesma da API Spring Boot, então as duas não sobem juntas sem trocar a porta de uma delas.
+
+O papel dela daqui em diante está pendente de alinhamento com a **Equipe 2 (backend de campanhas)**:
 
 | Hipótese | Descrição |
 |---|---|
@@ -202,7 +211,7 @@ Regras de integridade garantidas pelo banco (RNF-007):
 | 21 | GET | `/api/v1/usuarios` | Admin |
 | 22 | PATCH | `/api/v1/usuarios/{id}/status` | Admin |
 
-> Contrato completo com exemplos de request/response: [`rotas-api.md`](./rotas-api.md)
+> Contrato completo com exemplos de request/response: [`contrato-api.md`](./backend/contrato-api.md)
 
 ---
 
@@ -339,7 +348,7 @@ Responsabilidade compartilhada entre os grupos de desenvolvimento e o **Grupo 5 
 |---|---|---|
 | Testes de integração da API | `@SpringBootTest` + MockMvc + H2 | Todos os endpoints do back-end |
 | Testes de API (QA) | Postman / RestAssured | Contrato dos endpoints, happy path e erros |
-| Testes funcionais | Cypress / Selenium | Fluxos completos no front-end |
+| Testes funcionais | Cypress (em estudo) | Fluxos completos no front-end |
 | Testes de usabilidade | Manual com usuários reais | Fluxo de doação (RNF-010) |
 | Testes de regressão | Executados a cada PR | Garantia de que entregas novas não quebram as anteriores |
 
@@ -363,7 +372,6 @@ Fluxo de implementação TDD por prioridade:
 | PV01 | Gateway de pagamento PIX (ou outro meio) | Fluxo da doação passa de simulado para real |
 | PV05 | Envio de e-mail para recuperação de senha | Habilitação da rota de recuperação de senha |
 | PV06 | Exportação de relatórios (CSV/Excel) | Endpoint `POST /relatorios/exportar` |
-| — | Flyway/Liquibase para migração de schema | Necessário antes do primeiro deploy em produção |
 | — | Versão fixa do PostgreSQL no Docker Compose | Reproducibilidade do build |
 
 ---
@@ -382,24 +390,25 @@ Fluxo de implementação TDD por prioridade:
 - [x] Paginação nas listagens (RNF-028)
 - [x] Documentação OpenAPI de todos os endpoints (RNF-018)
 - [x] Versionamento com branches e PR obrigatório (RNF-019)
+- [x] Migração de schema com Flyway (V1 a V6)
 - [x] Ambientes separados (dev, homologação, produção) (RNF-025)
 - [x] CI/CD com build, lint e testes automáticos por PR (RNF-024)
 - [x] Suporte a múltiplas entidades por configuração, sem mudança de código (RNF-027)
 - [x] **DOC-08:** Diagrama e tabelas atualizados para a stack real (React + Vite, sem Next.js/Tailwind/Mobile)
-- [x] **DOC-08:** API Express registrada como componente com decisão pendente (PV-Express, Equipe 2)
+- [x] **DOC-08:** API Express registrada como API inicial da Sprint 1 (CAM-T04), com decisão pendente (PV-Express, Equipe 2)
 - [ ] Decisão sobre API Express registrada com Equipe 2 (PV-Express)
-- [ ] Flyway/Liquibase para migração de schema
 - [ ] Gateway de pagamento definido (PV01)
 - [ ] Deploy automático configurado (RNF-026)
 - [ ] Backup automático do banco de produção (RNF-030)
-- [ ] Integração frontend ↔ API Spring Boot ativada (substituir DemoProvider)
+- [x] Vitrine pública (Home, Explorar, Detalhe) integrada à API Spring Boot
+- [ ] Área de gestão integrada à API Spring Boot (substituir DemoProvider)
 
 ---
 
 ## Referências
 
 - [`requisitos.md`](./requisitos.md) — Requisitos funcionais (RF) e não funcionais (RNF)
-- [`rotas-api.md`](./rotas-api.md) — Contrato detalhado dos endpoints com exemplos
+- [`contrato-api.md`](./backend/contrato-api.md) — Contrato detalhado dos endpoints com exemplos
 - [`routes-plan.md`](./routes-plan.md) — Planejamento das rotas, decisões e problemas identificados
 - [`DESIGN-SYSTEM.md`](./frontend/DESIGN-SYSTEM.md) — Guia visual e componentes do front-end
 - [`DER.png`](./DER.png) — Diagrama entidade-relacionamento
