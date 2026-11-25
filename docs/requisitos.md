@@ -23,7 +23,7 @@ A solução está organizada em cinco módulos/equipes:
 
 **Pontos ambíguos e interpretação adotada:**
 
-- A documentação descreve a etapa "Realiza contribuição" e cita "Integrações", mas **não define o meio de pagamento** nem um provedor específico. Os requisitos tratam o registro da contribuição e seu status sem pressupor um gateway; a integração com meio de pagamento fica como decisão de projeto a ser detalhada.
+- O [escopo do MVP](./definicao-mvp.md) adota **PIX** como meio único de contribuição financeira, conforme RN23 e RN70. O [contrato da API](./backend/rotas-api.md) prevê pagamento simulado enquanto o gateway estiver indefinido.
 - Os indicadores "Valor arrecadado" e "Taxa de conclusão das doações" indicam que as doações possuem **valor** e **status** (iniciada, concluída, etc.), o que foi considerado nos requisitos.
 - Não há metas numéricas de desempenho ou disponibilidade na documentação; por isso, os RNFs usam critérios verificáveis sem criar valores arbitrários. Onde um número for necessário, ele deve ser definido pela equipe de Produto/Plataforma.
 
@@ -165,21 +165,21 @@ A solução está organizada em cinco módulos/equipes:
 **Origem/Justificativa:** Grupo 2 — "Compartilhar campanha".
 
 ### RF-020 — Início da doação
-**Descrição:** O sistema deve permitir que o doador inicie uma doação a partir da página de uma campanha ativa.
+**Descrição:** O sistema deve permitir que um doador autenticado inicie uma doação financeira via PIX a partir de uma campanha ativa ou diretamente para uma entidade aprovada (RN66, RN68 e RN70).
 **Atores envolvidos:** Doador
 **Prioridade:** Alta
-**Critério de aceitação:** Ao acionar "Doar", o doador é levado ao formulário de doação já vinculado à campanha escolhida; visitantes não autenticados são direcionados ao login/cadastro.
+**Critério de aceitação:** Ao acionar "Doar", o formulário identifica o destino selecionado. Visitantes são direcionados ao login/cadastro e só podem concluir o fluxo após autenticação. Doação anônima utiliza a mesma conta autenticada (RN22 e RN72).
 **Origem/Justificativa:** Grupo 3 — fluxo "Escolhe campanha → Inicia doação".
 
 ### RF-021 — Registro da doação
-**Descrição:** O sistema deve registrar a doação com doador, campanha, entidade, valor e data/hora.
+**Descrição:** O sistema deve registrar a doação com doador autenticado, destino (campanha ou entidade), valor, data/hora e indicação de anonimato (RN66, RN70 e RN72). Se o destino for uma campanha, o valor também é contabilizado para a entidade responsável, conforme RN69 e RN76.
 **Atores envolvidos:** Doador
 **Prioridade:** Alta
-**Critério de aceitação:** Após a contribuição, a doação é gravada e consultável com todos esses dados.
+**Critério de aceitação:** A doação registrada é consultável pelo próprio doador. Em doação anônima, a entidade recebe o registro sem identificação do doador, conforme RN72 e RNF-006.
 **Origem/Justificativa:** Grupo 3 — "Registro da doação"; indicador "Valor arrecadado".
 
 ### RF-022 — Status da doação
-**Descrição:** O sistema deve controlar o status de cada doação (ao menos: iniciada, concluída e cancelada/não concluída).
+**Descrição:** O sistema deve controlar os status Pendente, Confirmada e Cancelada da doação (RN69). A confirmação simulada do contrato atual é registrada como Confirmada. A transição de Pendente para Confirmada por pagamento bancário depende do gateway PIX.
 **Atores envolvidos:** Doador, Gestor de entidade
 **Prioridade:** Alta
 **Critério de aceitação:** Cada doação exibe um status válido, atualizado conforme o andamento do fluxo.
@@ -189,21 +189,21 @@ A solução está organizada em cinco módulos/equipes:
 **Descrição:** O sistema deve exibir ao doador uma confirmação ao concluir a doação.
 **Atores envolvidos:** Doador
 **Prioridade:** Alta
-**Critério de aceitação:** Ao concluir, é exibida tela de confirmação com campanha, valor e data.
+**Critério de aceitação:** Ao confirmar, a tela exibe código da doação, destino (campanha ou entidade), valor, data e forma de pagamento (RN71).
 **Origem/Justificativa:** Grupo 3 — etapa "Confirmação" do fluxo.
 
 ### RF-024 — Histórico de doações do doador
 **Descrição:** O sistema deve permitir que o doador consulte o histórico das suas doações.
 **Atores envolvidos:** Doador
 **Prioridade:** Média
-**Critério de aceitação:** O histórico lista todas as doações do usuário com campanha, valor, data e status.
+**Critério de aceitação:** O histórico lista as doações confirmadas do próprio doador, inclusive as anônimas, com destino (campanha ou entidade), valor, data e status (RN69 e RN72).
 **Origem/Justificativa:** Grupo 3 — "Histórico".
 
 ### RF-025 — Comprovante de doação
 **Descrição:** O sistema deve gerar um comprovante para cada doação concluída.
 **Atores envolvidos:** Doador
 **Prioridade:** Média
-**Critério de aceitação:** A partir do histórico, o doador acessa o comprovante de uma doação concluída contendo identificador, campanha, entidade, valor e data.
+**Critério de aceitação:** A partir do histórico, o doador acessa o comprovante de uma doação confirmada contendo identificador, destino (campanha ou entidade), valor, data e forma de pagamento (RN71).
 **Origem/Justificativa:** Grupo 3 — "Comprovantes".
 
 ### RF-026 — Painel de gestão de campanhas da entidade
@@ -282,15 +282,15 @@ A solução está organizada em cinco módulos/equipes:
 
 ### RNF-006 — Proteção dos dados do doador
 **Categoria:** Privacidade
-**Descrição:** Dados pessoais de doadores não devem ser exibidos em páginas públicas.
-**Métrica/Critério de aceitação:** Páginas de campanha e entidade não exibem nome, e-mail ou valores individuais de doadores.
+**Descrição:** Dados pessoais de doadores devem ficar restritos aos acessos autorizados. O anonimato oculta a identidade para a entidade e na exibição pública, preservando o vínculo interno para o histórico do doador (RN72).
+**Métrica/Critério de aceitação:** Páginas públicas de campanha e entidade não exibem nome, e-mail ou valores individuais de doadores. Na consulta de doações anônimas pela entidade, a API retorna `doador: null`, a interface exibe "Doador anônimo" e o registro continua no histórico autenticado do próprio doador.
 **Prioridade:** Alta
 **Origem/Justificativa:** Exibição pública de campanhas (Grupo 2) e registro de doações (Grupo 3).
 
 ### RNF-007 — Integridade referencial
 **Categoria:** Integridade dos dados
-**Descrição:** O banco deve garantir, por chaves e restrições, que toda doação esteja vinculada a um doador e a uma campanha existentes, e toda campanha a uma entidade.
-**Métrica/Critério de aceitação:** Tentativas de inserir registros órfãos são rejeitadas pelo banco.
+**Descrição:** O banco deve garantir, por chaves e restrições, que toda doação esteja vinculada a um doador existente e a exatamente um destino existente: campanha ou entidade. Toda campanha deve estar vinculada a uma entidade.
+**Métrica/Critério de aceitação:** Tentativas de inserir registros órfãos, sem destino ou com os dois destinos são rejeitadas.
 **Prioridade:** Alta
 **Origem/Justificativa:** Grupo 5 — "Relacionamentos" e "Integridade dos dados".
 
@@ -457,7 +457,18 @@ A solução está organizada em cinco módulos/equipes:
 
 ---
 
-## 4. Resumo dos Requisitos
+## 4. Delimitações da Sprint 3 para o QA
+
+| Tema | Limite para homologação do MVP |
+|---|---|
+| Doação física | Os testes de RF-020 e RF-021 cobrem contribuição financeira. Agendamento, coleta e conferência de itens e controle de estoque ficam fora deste ciclo. |
+| Pagamento | Somente PIX no fluxo de RF-020 a RF-023. A confirmação do contrato atual é simulada. A homologação bancária depende da integração do gateway PIX. |
+| Encerramento | RF-013 cobre o encerramento e o bloqueio de novas doações. A publicação de prestação de contas, incluindo saldo residual e comprovantes de despesas, fica proposta para pós-MVP. |
+| Filtros de campanha | RF-017 cobre entidade e status. Categoria fica proposta para pós-MVP, sujeita a definição de taxonomia, modelo e contrato de API. |
+
+Consulte as [regras de negócio](./regras-negocio.md#86-fora-do-escopo-do-mvp) e as [respostas ao QA](./qa/relatorio-qa-shiftleft-sprint2.md#51-lista-de-perguntas-objetivas-para-o-grupo-1-produto--ux) para a justificativa e os pontos de validação.
+
+## 5. Resumo dos Requisitos
 
 | Tipo | Quantidade |
 |---|---:|
