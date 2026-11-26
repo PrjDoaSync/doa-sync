@@ -17,7 +17,7 @@ feature/* ──► develop ──► main
 Regras:
 
 - Nunca faça commit direto em `main` ou `develop` (RNF-019).
-- Abra a branch de trabalho a partir da `develop` mais recente.
+- Abra a branch de trabalho a partir da `develop` mais recente. **Exceção:** no `doa-sync`, abra a partir da `main` (seção 8).
 - Uma branch resolve uma issue. Branches longas com assuntos misturados dificultam a revisão.
 - Apague a branch depois do merge.
 
@@ -30,7 +30,7 @@ Formato padrão: `<tipo>/<id-da-issue>-<descricao-curta>`, em minúsculas e com 
 | `feature/` | Funcionalidade nova | `feature/cam-t08-ciclo-vida-api` |
 | `fix/` | Correção de defeito | `fix/campanhas-visual` |
 | `docs/` | Somente documentação | `docs/180-indice-documentacao` |
-| `feat/` | Tarefa de definição ou planejamento | `feat/147-stack-definition` |
+| `feat/` | Formato antigo, ainda presente em branches existentes. Para branches novas, use `feature/` | `feat/147-stack-definition` |
 
 Em issues de módulo, use o código da task (por exemplo `cam-t08`). Nas demais, use o número da issue.
 
@@ -54,7 +54,7 @@ Exemplos:
 
 ```
 docs: índice central da documentação e correção de links #180
-feat: persistência de campanhas com migração Flyway #CAM-T07
+feat: persistência de campanhas com migração Flyway (CAM-T07) #<número-da-issue>
 fix: validar CNPJ duplicado no cadastro de entidade #141
 ```
 
@@ -89,7 +89,7 @@ A issue [#41 (Organizar as Branches)](https://github.com/PrjDoaSync/doa-sync/iss
 4. Título no mesmo padrão do commit. Descrição com o que mudou, por quê e como testar.
 5. Referencie a issue com `Closes #NN`.
 6. Peça revisão a pelo menos 1 membro que não seja o autor.
-7. O merge só acontece com pipeline verde e aprovação (RNF-019, RNF-024).
+7. O merge só acontece com pipeline verde e aprovação (RNF-019, RNF-024). Hoje isso é acordo de equipe: a proteção da `main` do `doa-sync` exige 1 aprovação, mas nenhum repositório bloqueia o merge por CI vermelho.
 
 ### Checklist do PR
 
@@ -137,5 +137,5 @@ Conforme [`docs/sprints/README.md`](./docs/sprints/README.md), uma entrega só e
 
 - Cada assunto tem um documento canônico em [`docs/`](./docs/README.md). Não duplique regras de negócio em outros arquivos: referencie o `RNxx`.
 - Quando um documento mudar no repositório de origem, atualize a cópia em `doa-sync/docs` no mesmo PR ou logo em seguida.
-- Mudou a API? Atualize [`docs/backend/rotas-api.md`](./docs/backend/rotas-api.md) e o Swagger.
-- Mudou o modelo de dados? Atualize o [`DER.png`](./docs/DER.png), [`entidades-envolvidas.md`](./docs/entidades-envolvidas.md) e a tabela do [`README.md`](./README.md).
+- Mudou a API? Atualize [`docs/backend/contrato-api.md`](./docs/backend/contrato-api.md) e o Swagger.
+- Mudou o modelo de dados? Atualize o [`modelo-de-dados.md`](./docs/modelo-de-dados.md) (dicionário e DER), o [`DER.png`](./docs/DER.png), o [`entidades-envolvidas.md`](./docs/entidades-envolvidas.md) e a tabela do [`README.md`](./README.md).
