@@ -121,5 +121,5 @@ Com 1 mês e zero código, o QA não pode esperar o produto pronto para testar. 
 
 - Nenhum endpoint vai para `main` sem testes de integração verdes
 - Testes precisam cobrir: happy path + pelo menos 2 casos de erro (validação e autorização)
-- Contrato dos testes segue exatamente `rotas-api.md` — não testar comportamentos não especificados
+- Contrato dos testes segue exatamente `backend/contrato-api.md` — não testar comportamentos não especificados
 - Relatório de bug abre Issue no GitHub com: reprodução, payload, resposta esperada vs. real

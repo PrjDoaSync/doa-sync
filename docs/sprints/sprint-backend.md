@@ -2,7 +2,7 @@
 
 > Stack: Java 17 · Spring Boot 4.1.1 · Maven · JPA · Spring Security · JWT
 > Repositório: `doasync-backend`
-> Referência de contrato: [`rotas-api.md`](../backend/rotas-api.md)
+> Referência de contrato: [`contrato-api.md`](../backend/contrato-api.md)
 
 ---
 
@@ -108,7 +108,7 @@
 
 ## Convenções obrigatórias
 
-- Toda rota nova segue o contrato de [`rotas-api.md`](../backend/rotas-api.md) — sem improvisar campos
+- Toda rota nova segue o contrato de [`contrato-api.md`](../backend/contrato-api.md) — sem improvisar campos
 - Branch por feature, PR obrigatório com ao menos 1 aprovação (RNF-019)
 - Testes de integração na mesma PR da feature
 - Senha nunca em texto puro, nunca em log (RNF-001, RNF-029)

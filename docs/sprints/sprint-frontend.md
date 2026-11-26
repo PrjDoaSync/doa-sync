@@ -1,7 +1,9 @@
-# Sprint Plan — Frontend (Next.js / React)
+# Sprint Plan — Frontend (React + Vite)
 
-> Stack: TypeScript · React 19 · Next.js 15 (App Router) · Tailwind CSS 4 · Phosphor Icons
-> Repositório: `doa-sync` (branches `dev-frontend` / feature branches)
+> Stack: JavaScript · React 19 · Vite 8 · React Router 7 · axios · oxlint · Vitest + React Testing Library (detalhes em [`stack.md`](../stack.md))
+> Repositório: `doasync-frontend`, pasta `web/` (fluxo de branches em [`CONTRIBUTING.md`](../../CONTRIBUTING.md))
+>
+> **Correção (26/11/2026):** a primeira versão deste plano previa Next.js 15, TypeScript, Tailwind CSS e Phosphor Icons. O frontend foi implementado com React + Vite, sem esses itens; as tarefas F1.1, F4.4 e F4.5 foram ajustadas.
 > Referência visual: [`DESIGN-SYSTEM.md`](../frontend/DESIGN-SYSTEM.md)
 
 ---
@@ -20,7 +22,7 @@ O backend bloqueia o frontend em cada módulo. Para não travar, **use MSW (Mock
 
 | # | Tarefa | RF | Estimativa |
 |---|---|---|---|
-| F1.1 | Setup Next.js 15 (App Router), TypeScript, Tailwind CSS 4, ESLint + Prettier | — | 0,5 dia |
+| F1.1 | Setup React + Vite, React Router e oxlint em `web/` | — | 0,5 dia |
 | F1.2 | Configurar cliente HTTP (fetch nativo ou axios) com interceptor de token JWT | RNF-003 | 0,5 dia |
 | F1.3 | Configurar MSW para mockar respostas da API durante o desenvolvimento | — | 0,5 dia |
 | F1.4 | Implementar design tokens e componentes base do Design System (Button, Input, Card, Badge, Avatar) | RNF-012, RNF-014 | 1 dia |
@@ -99,8 +101,8 @@ O backend bloqueia o frontend em cada módulo. Para não travar, **use MSW (Mock
 | F4.1 | Remover mocks MSW e apontar todas as chamadas para a API de homologação | 1 dia |
 | F4.2 | Testes de componentes com Vitest + React Testing Library nos fluxos críticos (login, doação) | 1 dia |
 | F4.3 | Tratar todos os estados de erro da API (401, 403, 404, 422, 409) com mensagens amigáveis | RNF-011 — 0,5 dia |
-| F4.4 | Configurar `next/image` para otimização de imagens de campanhas | 0,5 dia |
-| F4.5 | Build de produção (`npm run build`) sem erros TypeScript | 0,5 dia |
+| F4.4 | Otimizar as imagens de campanhas (tamanho e formato dos arquivos, carregamento sob demanda) | 0,5 dia |
+| F4.5 | Build de produção (`npm run build`) e lint (`npm run lint`) sem erros | 0,5 dia |
 | F4.6 | Smoke test completo no ambiente de homologação | 0,5 dia |
 
 **Entregáveis da Sprint 4:**

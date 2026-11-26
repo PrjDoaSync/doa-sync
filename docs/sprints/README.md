@@ -37,7 +37,7 @@ O backend **bloqueia** o frontend em cada módulo. A equipe de front deve mockar
 ## Arquivos por stack
 
 - [`sprint-backend.md`](./sprint-backend.md) — Java / Spring Boot
-- [`sprint-frontend.md`](./sprint-frontend.md) — Next.js / React
+- [`sprint-frontend.md`](./sprint-frontend.md) — React + Vite
 - [`sprint-banco.md`](./sprint-banco.md) — PostgreSQL / Flyway / Docker
 - [`sprint-qa.md`](./sprint-qa.md) — Testes, CI/CD, qualidade
 
@@ -60,5 +60,5 @@ Uma entrega só é considerada concluída quando:
 | Backend atrasado bloqueia front | Alta | Alto | Front usa mocks/MSW desde o dia 1 |
 | Sem gateway de pagamento (PV01) | Alta | Médio | Manter pagamento simulado no MVP |
 | Flyway não configurado antes do deploy | Média | Alto | Configurar na Sprint 1 junto com o banco |
-| Integração entre módulos com contratos divergentes | Média | Alto | Seguir `rotas-api.md` sem improvisar |
+| Integração entre módulos com contratos divergentes | Média | Alto | Seguir `backend/contrato-api.md` sem improvisar |
 | Falta de membro disponível | Média | Alto | Cada tarefa tem no máximo 2 dias |

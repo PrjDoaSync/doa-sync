@@ -4,6 +4,8 @@
 > Status: **planejamento das rotas do MVP (Sprint 1)** — contrato detalhado com JSON em [`rotas-api.md`](./backend/rotas-api.md). Implementação ainda não iniciada.
 > Itens marcados como **[DECISÃO]** dependem de validação humana (Grupo 1 / cliente / professor).
 
+> **Documento histórico (atualizado em 26/11/2026).** Este plano registra a análise de 07/10/2026. As rotas já foram implementadas no `doasync-backend`, e o contrato vigente é o [`backend/contrato-api.md`](./backend/contrato-api.md). As menções a **Next.js** se referem ao módulo de entidades em Next.js API Routes (branch `cadastro-entidades`) e ao frontend daquela época, que serviram de referência: o frontend atual é **React + Vite** ([`stack.md`](./stack.md)).
+
 ---
 
 ## 1. Contexto

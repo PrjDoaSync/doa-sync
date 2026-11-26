@@ -410,7 +410,7 @@ Após essas validações, o documento deverá ser atualizado para refletir as de
 
 - [Repositório oficial DoaSync](https://github.com/PrjDoaSync/doa-sync)
 - [Documentação de Requisitos](https://github.com/PrjDoaSync/doa-sync/blob/main/docs/requisitos.md)
-- [Contrato da API](https://github.com/PrjDoaSync/doa-sync/blob/main/docs/rotas-api.md)
+- [Contrato da API](https://github.com/PrjDoaSync/doa-sync/blob/main/docs/backend/contrato-api.md)
 - [GitHub Project — Equipe 2](https://github.com/orgs/PrjDoaSync/projects/6)
 - [CAM-T01 — Issue #152](https://github.com/PrjDoaSync/doa-sync/issues/152)
 - [CAM-T02 — Issue #153](https://github.com/PrjDoaSync/doa-sync/issues/153)

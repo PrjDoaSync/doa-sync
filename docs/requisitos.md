@@ -23,7 +23,7 @@ A solução está organizada em cinco módulos/equipes:
 
 **Pontos ambíguos e interpretação adotada:**
 
-- O [escopo do MVP](./definicao-mvp.md) adota **PIX** como meio único de contribuição financeira, conforme RN23 e RN70. O [contrato da API](./backend/rotas-api.md) prevê pagamento simulado enquanto o gateway estiver indefinido.
+- O [escopo do MVP](./definicao-mvp.md) adota **PIX** como meio único de contribuição financeira, conforme RN23 e RN70. O [contrato da API](./backend/contrato-api.md) prevê pagamento simulado enquanto o gateway estiver indefinido.
 - Os indicadores "Valor arrecadado" e "Taxa de conclusão das doações" indicam que as doações possuem **valor** e **status** (iniciada, concluída, etc.), o que foi considerado nos requisitos.
 - Não há metas numéricas de desempenho ou disponibilidade na documentação; por isso, os RNFs usam critérios verificáveis sem criar valores arbitrários. Onde um número for necessário, ele deve ser definido pela equipe de Produto/Plataforma.
 
