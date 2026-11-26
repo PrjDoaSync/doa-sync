@@ -1,6 +1,6 @@
 # DoaSync
 
-Plataforma web de arrecadação de doações. Conecta doadores a entidades assistenciais (foco inicial: APAE e Associação Amor Inclusivo), com campanhas públicas, registro de doações e painel de gestão.
+Plataforma web de arrecadação de doações, que conecta doadores a entidades assistenciais, com campanhas públicas, registro de doações e painel de gestão.
 
 ## Documentação
 
@@ -22,16 +22,16 @@ O projeto está dividido em 4 repositórios da organização [PrjDoaSync](https:
 
 | Repositório | O que contém | Branch com o código |
 |---|---|---|
-| [`doa-sync`](https://github.com/PrjDoaSync/doa-sync) (este) | Documentação central: requisitos, regras de negócio, modelo de dados, arquitetura, sprints | `main` (documentação) |
+| [`doa-sync`](https://github.com/PrjDoaSync/doa-sync) (este) | Documentação central: requisitos, regras de negócio, modelo de dados, arquitetura, sprints | `main` |
 | [`doasync-backend`](https://github.com/PrjDoaSync/doasync-backend) (privado) | API REST em Java 17 e Spring Boot, migrações Flyway | `develop` |
-| [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) | Aplicação web em React (Vite) em `web/` | `develop` |
+| [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) | Aplicação web em React + Vite, em `web/` | `develop` |
 | [`quality`](https://github.com/PrjDoaSync/quality) | Testes automatizados de API e interface, plano de testes manuais | `develop` |
 
 O código de aplicação vive na branch `develop` de cada repositório de código. A `main` recebe as entregas já integradas e validadas. Regras de branches e PRs em [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## Modelo de dados
 
-As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V4`) e o diagrama [`docs/DER.png`](./docs/DER.png). A descrição detalhada está em [`docs/entidades-envolvidas.md`](./docs/entidades-envolvidas.md).
+As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V6`) e o diagrama [`docs/DER.png`](./docs/DER.png). A descrição detalhada está em [`docs/entidades-envolvidas.md`](./docs/entidades-envolvidas.md).
 
 | Entidade (tabela) | Descrição |
 |---|---|
@@ -41,7 +41,7 @@ As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V4`) e o di
 | `Telefone` (`telefones`) | Telefones do usuário (1:N) |
 | `Endereco` (`enderecos`) | Endereços do usuário (1:N) |
 | `Entidade` (`entidades`) | Perfil institucional da entidade assistencial, responsável e status (`PENDENTE`, `APROVADA`, `REPROVADA`, `INATIVA`) |
-| `Campanha` (`campanhas`) | Iniciativa de arrecadação de uma entidade, com meta, período e status (`ATIVA`, `ENCERRADA`, `DESATIVADA`) |
+| `Campanha` (`campanhas`) | Iniciativa de arrecadação de uma entidade, com meta, período e status (`RASCUNHO`, `AGENDADA`, `ATIVA`, `ENCERRADA`, `DESATIVADA`) |
 | `Doacao` (`doacoes`) | Contribuição de um doador a uma campanha ou diretamente a uma entidade. Status `PENDENTE`, `CONFIRMADA` ou `CANCELADA` |
 
 Não há exclusão física: todas as chaves estrangeiras usam `ON DELETE RESTRICT` para preservar o histórico (RN51).
@@ -52,19 +52,24 @@ Não há exclusão física: todas as chaves estrangeiras usam `ON DELETE RESTRIC
 |---|---|
 | Backend | Java 17, Spring Boot, Spring Security (JWT), JPA, Flyway |
 | Banco | PostgreSQL (homologação e produção), H2 (desenvolvimento e testes) |
-| Frontend web | React |
+| Frontend web | React + Vite |
 | CI/CD | GitHub Actions |
 
 Detalhes e justificativas em [`docs/stack.md`](./docs/stack.md) e [`docs/arquitetura.md`](./docs/arquitetura.md).
 
-## Equipes e responsabilidades
+## Equipes
 
-| Equipe | Responsabilidade |
-|---|---|
-| Equipe 1 | Produto, usuários e entidades |
-| Equipe 2 | Módulo de campanhas |
-| Equipe 3 | Módulo de doações |
-| Equipe 4 | Gestão e dashboard (frontend web) |
-| Grupo 5 | Qualidade de software (QA), testes e CI/CD |
+As equipes são identificadas pela função. Cada uma trabalha no seu repositório.
+
+| Equipe | Responsabilidade | Repositório | Integrantes |
+|---|---|---|---|
+| Documentação | Produto, requisitos, regras de negócio, UX e documentação | `doa-sync` | vitorh07 (coord.), joaoalex4ndr3, LuisFelipeCorreia, IanLucasss, almeida-carol, DreBartolomeu |
+| Backend | API Spring Boot, banco e módulos de usuários, entidades, campanhas, doações e dashboard | `doasync-backend` | CauaRMesquita, Trincademes, GustavoSilveira1012, JV2008, MatheusAlves08, Pedro-Vitor-Ribeiro-Silva, pietrosantos15 |
+| Frontend | Aplicação web em React + Vite | `doasync-frontend` | julioCoronetti, Nicolas75460, pulcinelli123, nick0lasrm, LucasIanovski, GustavoRibasSilestrino |
+| QA | Testes, qualidade e CI/CD | `quality` | Gusleme, AmosSantos02, MuriloDev1, Rekyrt24, paolacostxx, TuannyThomazelli, jenifferCamar |
 
 O planejamento por sprint e por stack está em [`docs/sprints/README.md`](./docs/sprints/README.md).
+
+## Proteção de branches
+
+No `doa-sync`, a `main` e a `dev-frontend` são protegidas: merge somente por pull request com pelo menos uma aprovação, sem force push. A `main` deste repositório recebe PRs diretos das branches `docs/*` e de trabalho. Nos outros três repositórios, o fluxo `feature/*` → `develop` → `main` é acordo de equipe, sem bloqueio técnico.
