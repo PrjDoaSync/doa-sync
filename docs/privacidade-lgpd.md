@@ -1,9 +1,9 @@
 # Nota de Privacidade e LGPD — DoaSync
 
 > **Issue:** [#194 — DOC-15](https://github.com/PrjDoaSync/doa-sync/issues/194)
-> **Base:** RNF-005 e RNF-006 ([`requisitos.md`](./requisitos.md)), RN35, RN72 e RN73 ([`regras-negocio.md`](./regras-negocio.md)) e as migrações Flyway `V1` a `V4` do `doasync-backend`.
+> **Base:** RNF-005 e RNF-006 ([`requisitos.md`](./requisitos.md)), RN35, RN72 e RN73 ([`regras-negocio.md`](./regras-negocio.md)) e as migrações Flyway `V1` a `V6` do `doasync-backend`.
 
-Este documento descreve quais dados pessoais o DoaSync coleta, para quê, por quanto tempo ficam guardados e quem os acessa. Ele registra o que o sistema faz **hoje** e separa, na seção 7, o que ainda precisa de decisão.
+Este documento descreve quais dados pessoais o DoaSync coleta, para quê, por quanto tempo ficam guardados e quem os acessa. Ele registra o que o sistema faz **hoje** e lista as limitações conhecidas na seção 7.
 
 > Este texto é documentação técnica do projeto. Não substitui parecer jurídico nem o texto final da política de privacidade exibida ao usuário.
 
@@ -12,12 +12,14 @@ Este documento descreve quais dados pessoais o DoaSync coleta, para quê, por qu
 | Papel (LGPD) | Quem é no DoaSync |
 |---|---|
 | Titular | Doador (pessoa física ou jurídica), responsável pela entidade e administrador |
-| Controlador | A definir. Depende de quem opera a plataforma após o projeto de extensão (ver seção 7) |
-| Operador | A definir, junto com o controlador |
+| Controlador | A definir pela organização que operar a plataforma (limitação LGPD-01) |
+| Operador | A definir, junto com o controlador (limitação LGPD-01) |
+
+O DoaSync é uma plataforma geral de doações, sem instituição cliente fixa. Cada entidade cadastrada responde pelos dados que recebe dos doadores das suas campanhas. O foco inicial de APAE e Associação Amor Inclusivo foi a base do escopo inicial do projeto e foi descontinuado; nenhuma delas é cliente, controladora ou revisora.
 
 ## 2. Dados coletados
 
-Campos conforme as tabelas do banco. A coluna "Visibilidade" indica o que outros perfis veem (detalhes na seção 5).
+Campos conforme as tabelas do banco (`V1`, `V3`) e o `DoadorCadastroRequisicao` do backend. A migração `V6` só acrescenta o status `RASCUNHO` às campanhas e não cria dados pessoais.
 
 ### 2.1 Conta de acesso (todo usuário)
 
@@ -73,13 +75,15 @@ CNPJ e razão social identificam organizações. Mesmo assim, em entidades de pe
 
 ### 2.7 Dados que o sistema não coleta
 
-- Dados de cartão ou conta bancária. O pagamento no MVP é PIX simulado, sem gateway (PV01).
+- Dados de cartão ou conta bancária. O pagamento no MVP é PIX simulado, sem gateway. O gateway de pagamento está fora do MVP, sem data prevista (C7).
 - Dados sensíveis conforme o art. 5º, II da LGPD (saúde, origem racial, convicção religiosa etc.).
 - Localização do dispositivo.
 
-> **Atenção:** o campo `observacao` é texto livre. O usuário pode digitar nele qualquer informação, inclusive sensível. A interface deve orientar para não incluir dados pessoais ou de saúde.
+> **Atenção (limitação LGPD-05):** o campo `observacao` é texto livre. O usuário pode digitar nele qualquer informação, inclusive sensível. A interface ainda não orienta sobre isso.
 
 ## 3. Bases legais e finalidades
+
+> **Aviso:** as bases abaixo são **sugestão técnica, pendente de validação jurídica** (C6). A definição final cabe ao controlador, quando definido.
 
 | Finalidade | Dados | Base legal sugerida (art. 7º) |
 |---|---|---|
@@ -88,11 +92,20 @@ CNPJ e razão social identificam organizações. Mesmo assim, em entidades de pe
 | Verificar maioridade | Data de nascimento | Cumprimento de obrigação legal ou regulatória (II) |
 | Aprovar e publicar entidades | Dados institucionais e do responsável | Execução de contrato (V) e legítimo interesse (IX) |
 | Segurança, auditoria e prevenção a fraude (RNF-009) | Datas, status, chave de idempotência | Legítimo interesse (IX) |
-| Aceite da política de privacidade no cadastro | Todos os dados do cadastro | Consentimento (I), exigido pelo RNF-005 |
-
-As bases são uma sugestão técnica. A definição final cabe ao controlador, com apoio jurídico.
+| Aceite da política de privacidade no cadastro | Todos os dados do cadastro | Consentimento (I), exigido pelo RNF-005 — **não implementado** (limitação LGPD-04) |
 
 ## 4. Retenção
+
+**Política proposta, ainda não implementada** (C5):
+
+| Tipo de dado | Prazo proposto |
+|---|---|
+| Conta ativa | Enquanto a conta existir |
+| Pedido de eliminação ou desativação | Anonimizar os dados pessoais e manter o registro da doação (compatível com a RN51, sem exclusão física) |
+| Doações e prestação de contas | 5 anos |
+| Logs de acesso | 6 meses |
+
+O que o sistema faz **hoje**:
 
 | Situação | O que acontece hoje |
 |---|---|
@@ -100,7 +113,7 @@ As bases são uma sugestão técnica. A definição final cabe ao controlador, c
 | Conta desativada | O usuário passa a `INATIVO`, perde o acesso e os dados permanecem |
 | Entidade desativada | Passa a `INATIVA`. Campanhas ativas são encerradas e o histórico continua disponível (RN55) |
 | Doação confirmada | Não pode ser editada nem excluída (RN74) |
-| Prazo de guarda | **Não definido.** Ver seção 7 |
+| Logs e backups | Sem política definida (limitação LGPD-07) |
 
 ## 5. Quem acessa os dados
 
@@ -125,31 +138,34 @@ Controles técnicos:
 
 ## 6. Direitos do titular
 
-A LGPD (art. 18) garante ao titular os direitos abaixo. A coluna "Situação" descreve o que o projeto oferece.
+A LGPD (art. 18) garante ao titular os direitos abaixo.
 
 | Direito | Situação no MVP |
 |---|---|
 | Confirmação e acesso aos dados | Parcial. O usuário vê o próprio perfil (`GET /usuarios/me`) |
 | Correção de dados | Disponível para os dados editáveis do perfil (`PATCH /usuarios/me`). CPF e CNPJ não são editáveis |
-| Anonimização, bloqueio ou eliminação | Não disponível. Existe apenas desativação da conta |
+| Anonimização, bloqueio ou eliminação | Não disponível na interface. Proposta: anonimizar e manter o registro da doação (seção 4) |
 | Portabilidade | Não disponível |
 | Informação sobre compartilhamento | Este documento. Ainda precisa ser publicado na interface |
 | Revogação do consentimento | Não disponível |
 
-Enquanto não houver fluxo automatizado, as solicitações devem ser tratadas por contato direto com o responsável da plataforma (canal a definir).
+Enquanto não houver fluxo automatizado, as solicitações devem ser tratadas por contato direto com o responsável da plataforma (canal a definir, limitação LGPD-01).
 
-## 7. Pendências e decisões em aberto
+## 7. Limitações conhecidas
 
-| ID | Pendência | Impacto |
+Recursos que ainda não foram desenvolvidos. Nenhum deles bloqueia a publicação deste documento; cada entrada registra o pedido correspondente enviado às equipes.
+
+| ID | Limitação | Pedido de origem |
 |---|---|---|
-| LGPD-01 | Definir o controlador e o canal de contato do encarregado (DPO) | Obrigatório para publicar a política de privacidade |
-| LGPD-02 | Definir prazo de retenção por tipo de dado | Hoje nada é apagado |
-| LGPD-03 | Definir como atender pedidos de eliminação e anonimização, considerando a regra RN51 (sem exclusão física) e a guarda de registros de doações | Direitos do titular (art. 18) |
-| LGPD-04 | Confirmar se o cadastro exige e registra o aceite da política de privacidade (RNF-005). O backend não possui campo para registrar data e versão do aceite | Critério de aceitação do RNF-005 |
-| LGPD-05 | Orientar o usuário na interface para não incluir dados sensíveis no campo `observacao` | Minimização de dados |
-| LGPD-06 | Rever a política quando houver gateway de pagamento real (PV01), pois passam a existir dados de pagamento e um novo operador | Escopo da coleta |
-| LGPD-07 | Definir política de backup e de logs sem dados pessoais (RNF-030) | Segurança |
+| LGPD-01 | Controlador, DPO e canal de contato: a definir pela organização que operar a plataforma | C4 |
+| LGPD-02 | Retenção proposta (seção 4) ainda não implementada | C5 |
+| LGPD-03 | Fluxo de anonimização para pedidos de eliminação não implementado | C5 |
+| LGPD-04 | O cadastro não registra aceite da política de privacidade (o `DoadorCadastroRequisicao` não tem esse campo), embora o RNF-005 o exija | B1, F8 |
+| LGPD-05 | A interface não orienta o usuário a não incluir dados sensíveis no campo `observacao` | F8 |
+| LGPD-06 | Gateway de pagamento fora do MVP, sem data prevista. Quando houver, rever a política (novos dados e um novo operador) | C7 |
+| LGPD-07 | Sem política de logs e backups definida (RNF-029 e RNF-030) | B3 |
+| LGPD-08 | As páginas `/privacidade` e `/termos` do frontend (`Informacoes.jsx`) descrevem o ambiente demonstrativo, não a política real. Não há conflito de conteúdo com esta nota, mas o texto de produção será definido pela equipe antes da publicação | F7 |
 
 ## 8. Revisão
 
-Revisar este documento sempre que uma migração alterar tabelas com dados pessoais, quando houver mudança de provedor de hospedagem ou pagamento, e ao fechar cada pendência da seção 7.
+Revisar este documento sempre que uma migração alterar tabelas com dados pessoais, quando houver mudança de provedor de hospedagem ou pagamento, e quando cada limitação da seção 7 for resolvida.
