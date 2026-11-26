@@ -89,7 +89,7 @@ CNPJ e razão social identificam organizações. Mesmo assim, em entidades de pe
 |---|---|---|
 | Criar e manter a conta, autenticar | Nome, e-mail, senha, CPF/CNPJ, telefone | Execução de contrato ou de procedimentos preliminares (V) |
 | Registrar doações e emitir comprovante | Dados da doação e do doador | Execução de contrato (V) |
-| Verificar maioridade | Data de nascimento | Cumprimento de obrigação legal ou regulatória (II) |
+| Verificar maioridade | Data de nascimento | Cumprimento de obrigação legal ou regulatória (II). A idade mínima é regra do produto (RN44, ainda a confirmar); se não houver exigência legal, a base passa a ser execução de contrato (V) |
 | Aprovar e publicar entidades | Dados institucionais e do responsável | Execução de contrato (V) e legítimo interesse (IX) |
 | Segurança, auditoria e prevenção a fraude (RNF-009) | Datas, status, chave de idempotência | Legítimo interesse (IX) |
 | Aceite da política de privacidade no cadastro | Todos os dados do cadastro | Consentimento (I), exigido pelo RNF-005 — **não implementado** (limitação LGPD-04) |
@@ -134,7 +134,7 @@ Controles técnicos:
 - Comunicação via HTTPS em produção (RNF-002).
 - Autenticação por token JWT com validade de 8 horas.
 - O dono do recurso é validado no servidor: um token válido não dá acesso a dados de terceiros.
-- Os contratos de resposta omitem dados do doador quando a doação é anônima ([`rotas-api.md`](./backend/rotas-api.md)).
+- Os contratos de resposta omitem dados do doador quando a doação é anônima ([`contrato-api.md`](./backend/contrato-api.md)).
 
 ## 6. Direitos do titular
 
@@ -155,6 +155,8 @@ Enquanto não houver fluxo automatizado, as solicitações devem ser tratadas po
 
 Recursos que ainda não foram desenvolvidos. Nenhum deles bloqueia a publicação deste documento; cada entrada registra o pedido correspondente enviado às equipes.
 
+> Os códigos da coluna "Pedido de origem" (C = coordenação, B = backend, F = frontend) identificam as perguntas da rodada de alinhamento respondida em 23/11/2026. Esse registro não está neste repositório: ao resolver uma limitação, cite a issue correspondente no lugar do código.
+
 | ID | Limitação | Pedido de origem |
 |---|---|---|
 | LGPD-01 | Controlador, DPO e canal de contato: a definir pela organização que operar a plataforma | C4 |
@@ -164,7 +166,7 @@ Recursos que ainda não foram desenvolvidos. Nenhum deles bloqueia a publicaçã
 | LGPD-05 | A interface não orienta o usuário a não incluir dados sensíveis no campo `observacao` | F8 |
 | LGPD-06 | Gateway de pagamento fora do MVP, sem data prevista. Quando houver, rever a política (novos dados e um novo operador) | C7 |
 | LGPD-07 | Sem política de logs e backups definida (RNF-029 e RNF-030) | B3 |
-| LGPD-08 | As páginas `/privacidade` e `/termos` do frontend (`Informacoes.jsx`) descrevem o ambiente demonstrativo, não a política real. Não há conflito de conteúdo com esta nota, mas o texto de produção será definido pela equipe antes da publicação | F7 |
+| LGPD-08 | As páginas `/privacidade` e `/termos` do frontend (`Informacoes.jsx`) descrevem o ambiente demonstrativo, não a política real. Elas ainda dizem que as doações "ficam na memória desta sessão", mas desde o PR #145 do front (24/11/2026) o cadastro de doador, o login e a doação PIX gravam dados reais na API. O texto precisa ser atualizado pela equipe de Frontend antes da publicação | F7 |
 
 ## 8. Revisão
 
