@@ -1,33 +1,75 @@
 # DoaSync
 
-Plataforma de gerenciamento e facilitação de doações.
+Plataforma web de arrecadação de doações, que conecta doadores a entidades assistenciais, com campanhas públicas, registro de doações e painel de gestão.
 
 ## Documentação
 
-Toda a documentação do projeto está indexada em [`docs/README.md`](./docs/README.md), com o documento canônico de cada assunto.
-
-## Sobre o Projeto
-
-O DoaSync conecta pessoas a projetos de doação, tornando o processo de contribuir mais simples e acessível. A ideia central é reduzir a fricção entre quem quer ajudar e quem precisa, centralizando projetos, campanhas e agendamentos em um único lugar.
+Toda a documentação do projeto está indexada em [`docs/README.md`](./docs/README.md), com o documento canônico de cada assunto. Para contribuir, leia o [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## Funcionalidades
 
-- Cadastro de usuários (pessoa física e jurídica)
-- Listagem e acompanhamento de projetos de doação
-- Registro de doações com valor, forma de pagamento e observações
-- Agendamento de entregas ou participações em projetos
-- Gestão de produtos e pedidos vinculados às campanhas
+- Cadastro de doadores (pessoa física ou jurídica) e de entidades assistenciais
+- Aprovação, reprovação e desativação de entidades pelo administrador
+- Criação, edição, publicação e encerramento de campanhas de arrecadação
+- Doação a uma campanha ou diretamente a uma entidade (PIX simulado no MVP), com comprovante e histórico
+- Dashboard e gestão para entidade e administrador
 
-## Modelo de Dados
+Escopo completo em [`docs/definicao-mvp.md`](./docs/definicao-mvp.md) e [`docs/funcionalidades.md`](./docs/funcionalidades.md).
 
-A aplicação é estruturada em torno das seguintes entidades principais:
+## Organização dos repositórios
 
-| Entidade | Descrição |
+O projeto está dividido em 4 repositórios da organização [PrjDoaSync](https://github.com/PrjDoaSync).
+
+| Repositório | O que contém | Branch com o código |
+|---|---|---|
+| [`doa-sync`](https://github.com/PrjDoaSync/doa-sync) (este) | Documentação central: requisitos, regras de negócio, modelo de dados, arquitetura, sprints | `main` |
+| [`doasync-backend`](https://github.com/PrjDoaSync/doasync-backend) (privado) | API REST em Java 17 e Spring Boot, migrações Flyway | `develop` |
+| [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) | Aplicação web em React + Vite, em `web/` | `develop` |
+| [`quality`](https://github.com/PrjDoaSync/quality) | Testes automatizados de API e interface, plano de testes manuais | `develop` |
+
+O código de aplicação vive na branch `develop` de cada repositório de código. A `main` recebe as entregas já integradas e validadas. Regras de branches e PRs em [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+## Modelo de dados
+
+As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V6`) e o diagrama [`docs/DER.png`](./docs/DER.png). A descrição detalhada está em [`docs/entidades-envolvidas.md`](./docs/entidades-envolvidas.md).
+
+| Entidade (tabela) | Descrição |
 |---|---|
-| `Usuario` | Pessoa cadastrada na plataforma |
-| `Pessoa Física / Jurídica` | Especialização do usuário (CPF ou CNPJ) |
-| `Projeto` | Campanha ou iniciativa que recebe doações |
-| `Doacao` | Registro de uma contribuição feita por um usuário a um projeto |
-| `Agendamento` | Marcação de data/hora para participação em um projeto |
-| `Pedido / Item Pedido` | Solicitação de produtos vinculada a um usuário |
-| `Produto` | Itens disponíveis para doação ou distribuição |
+| `Usuario` (`usuarios`) | Conta de acesso. Tipo: `PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE` ou `ADMIN`. Status `ATIVO` ou `INATIVO` |
+| `PessoaFisica` (`pessoas_fisicas`) | Especialização do usuário com CPF e data de nascimento |
+| `PessoaJuridica` (`pessoas_juridicas`) | Especialização do usuário com CNPJ e razão social. Usada por doador PJ e por entidade |
+| `Telefone` (`telefones`) | Telefones do usuário (1:N) |
+| `Endereco` (`enderecos`) | Endereços do usuário (1:N) |
+| `Entidade` (`entidades`) | Perfil institucional da entidade assistencial, responsável e status (`PENDENTE`, `APROVADA`, `REPROVADA`, `INATIVA`) |
+| `Campanha` (`campanhas`) | Iniciativa de arrecadação de uma entidade, com meta, período e status (`RASCUNHO`, `AGENDADA`, `ATIVA`, `ENCERRADA`, `DESATIVADA`) |
+| `Doacao` (`doacoes`) | Contribuição de um doador a uma campanha ou diretamente a uma entidade. Status `PENDENTE`, `CONFIRMADA` ou `CANCELADA` |
+
+Não há exclusão física: todas as chaves estrangeiras usam `ON DELETE RESTRICT` para preservar o histórico (RN51).
+
+## Stack
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Java 17, Spring Boot, Spring Security (JWT), JPA, Flyway |
+| Banco | PostgreSQL (homologação e produção), H2 (desenvolvimento e testes) |
+| Frontend web | React + Vite |
+| CI/CD | GitHub Actions |
+
+Detalhes e justificativas em [`docs/stack.md`](./docs/stack.md) e [`docs/arquitetura.md`](./docs/arquitetura.md).
+
+## Equipes
+
+As equipes são identificadas pela função. Cada uma trabalha no seu repositório.
+
+| Equipe | Responsabilidade | Repositório | Integrantes |
+|---|---|---|---|
+| Documentação | Produto, requisitos, regras de negócio, UX e documentação | `doa-sync` | vitorh07 (coord.), joaoalex4ndr3, LuisFelipeCorreia, IanLucasss, almeida-carol, DreBartolomeu |
+| Backend | API Spring Boot, banco e módulos de usuários, entidades, campanhas, doações e dashboard | `doasync-backend` | CauaRMesquita, Trincademes, GustavoSilveira1012, JV2008, MatheusAlves08, Pedro-Vitor-Ribeiro-Silva, pietrosantos15 |
+| Frontend | Aplicação web em React + Vite | `doasync-frontend` | julioCoronetti, Nicolas75460, pulcinelli123, nick0lasrm, LucasIanovski, GustavoRibasSilestrino |
+| QA | Testes, qualidade e CI/CD | `quality` | Gusleme, AmosSantos02, MuriloDev1, Rekyrt24, paolacostxx, TuannyThomazelli, jenifferCamar |
+
+O planejamento por sprint e por stack está em [`docs/sprints/README.md`](./docs/sprints/README.md).
+
+## Proteção de branches
+
+No `doa-sync`, a `main` e a `dev-frontend` são protegidas: merge somente por pull request com pelo menos uma aprovação, sem force push. A `main` deste repositório recebe PRs diretos das branches `docs/*` e de trabalho. Nos outros três repositórios, o fluxo `feature/*` → `develop` → `main` é acordo de equipe, sem bloqueio técnico.
