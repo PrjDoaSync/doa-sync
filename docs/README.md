@@ -35,14 +35,22 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 |---|---|---|
 | [DER.png](./DER.png) | Diagrama entidade-relacionamento, **fonte única do modelo** | Coordenação |
 | [entidades-envolvidas.md](./entidades-envolvidas.md) | Descrição das entidades | Coordenação |
+| [modelo-de-dados.md](./modelo-de-dados.md) | Modelo do banco real: dicionário de dados, constraints e divergências com as modelagens antigas | Documentação |
 | [arquitetura.md](./arquitetura.md) | Arquitetura da aplicação | Back |
 | [stack.md](./stack.md) | Stack tecnológica e justificativas | Back |
+
+## Guias de execução
+
+| Documento | Assunto | Dono |
+|---|---|---|
+| [guia-instalacao-execucao-local.md](./guia-instalacao-execucao-local.md) | Instalar e executar back-end e front-end localmente | Documentação |
 
 ## Backend
 
 | Documento | Assunto | Dono | Origem |
 |---|---|---|---|
-| [backend/rotas-api.md](./backend/rotas-api.md) | Contrato da API: requisição e resposta (JSON) de cada rota | Back | — |
+| [backend/contrato-api.md](./backend/contrato-api.md) | **Contrato consolidado da API** — 22 rotas com método, path, perfil de acesso, request, response, erros e status (✅ implementada / 🔧 planejada) | Back | — |
+| [backend/rotas-api.md](./backend/rotas-api.md) | Contrato da API: requisição e resposta (JSON) de cada rota — referência histórica; ver `contrato-api.md` | Back | — |
 | [routes-plan.md](./routes-plan.md) | Planejamento da API: decisões, dependências, ordem de implementação e problemas encontrados | Back | — |
 | [backend/pipeline-ci-cd.md](./backend/pipeline-ci-cd.md) | Guia de pipeline CI/CD do backend | Back | — |
 | [backend/cenarios-testes-api.md](./backend/cenarios-testes-api.md) | Cenários de teste da API | QA | `quality` |
@@ -56,6 +64,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | Documento | Assunto | Dono | Origem |
 |---|---|---|---|
 | [frontend/DESIGN-SYSTEM.md](./frontend/DESIGN-SYSTEM.md) | Design system (tokens, componentes), usado por web e mobile | Front | — |
+| [frontend/handoff-ui-ux-estados.md](./frontend/handoff-ui-ux-estados.md) | Handoff UI/UX: mapa Figma × rotas, tokens, estados (loading, vazio, erro) e mensagens por código HTTP | Documentação | — |
 | [frontend/frontend-web.md](./frontend/frontend-web.md) | Frontend web | Front | `doasync-frontend` |
 | [frontend/frontend-validacao.md](./frontend/frontend-validacao.md) | Validação das telas | Front | `doasync-frontend` |
 | [frontend/frontend-testes-unitarios.md](./frontend/frontend-testes-unitarios.md) | Testes unitários do frontend | Front | `doasync-frontend` |
@@ -75,6 +84,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 
 | Documento | Assunto | Dono |
 |---|---|---|
+| [../CONTRIBUTING.md](../CONTRIBUTING.md) | Guia de contribuição: branches, commits, PRs e issues | Documentação |
 | [sprints/README.md](./sprints/README.md) | Planejamento geral das sprints | Coordenação |
 | [sprints/sprint-backend.md](./sprints/sprint-backend.md) | Sprint do backend | Back |
 | [sprints/sprint-banco.md](./sprints/sprint-banco.md) | Sprint do banco de dados | Back |
