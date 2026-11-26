@@ -7,7 +7,7 @@ Este guia mostra como apoiar uma campanha no DoaSync. Você não precisa de conh
 
 ## Antes de começar
 
-> **Estado atual do sistema.** A versão web disponível hoje é uma **demonstração**. Ela usa **dados fictícios**, não cobra nenhum valor e não exige login real. Um aviso fixo no topo da tela lembra disso. As telas de cadastro do doador e de histórico de doações ainda **não existem** no frontend. Elas estão descritas aqui como "Previsto", conforme as regras de negócio, e este manual deve ser atualizado quando forem entregues.
+> **Estado atual do sistema.** A versão web disponível hoje é uma **demonstração**. Ela usa **dados fictícios**, não cobra nenhum valor e não exige login real. Um aviso fixo no topo da tela lembra disso. Recursos ainda não desenvolvidos aparecem na seção **Limitações conhecidas** no fim deste manual.
 
 | Símbolo | Significado |
 |---|---|
@@ -48,9 +48,10 @@ Passo a passo:
 
 | Mensagem | O que fazer |
 |---|---|
-| E-mail ou CPF já cadastrado | Use a opção de entrar. Se esqueceu a senha, use **Esqueceu sua senha?** |
+| E-mail ou CPF já cadastrado | Use a opção de entrar |
 | Senha inválida | Use pelo menos 8 caracteres, com letras e números |
 | Menor de idade | O cadastro é permitido somente para maiores de 18 anos |
+| Esqueceu a senha | Procure o administrador da plataforma (ver limitação L4) |
 
 ---
 
@@ -58,11 +59,10 @@ Passo a passo:
 
 1. Na página inicial, clique em **Entrar**, no canto superior direito.
 2. Na tela **Entre na sua conta**, informe e-mail e senha.
-3. Se esqueceu a senha, clique em **Esqueceu sua senha?**.
 
 📷 *Captura pendente:* `img/doador/02-login.png`
 
-> Na demonstração, o login não autentica ninguém. Para sair da conta no sistema real, use a opção **Sair**.
+> Na demonstração, o login não autentica ninguém. Para sair da conta no sistema real, use a opção **Sair**. O link **Esqueceu sua senha?** não tem função nesta versão (ver limitação L4).
 
 ---
 
@@ -94,7 +94,7 @@ Somente campanhas **ativas** recebem doações. Se aparecer o aviso **Esta campa
 **Doação financeira**
 
 3. Em **Escolha o valor**, clique em um dos valores sugeridos ou digite outro em **Digite um valor**. O valor precisa ser maior que zero.
-4. Em **Forma de pagamento**, escolha **PIX**, **Cartão** ou **Boleto** e siga as instruções da tela.
+4. Em **Forma de pagamento**, o **PIX** é o único meio previsto no MVP. Siga as instruções da tela. Na demonstração, aparecem também cartão e boleto; essas opções **estão fora do MVP** e servem apenas para testar a interface.
 5. Em **Identificação do doador**, informe nome e e-mail, ou escolha **Doação anônima** (veja a seção 6).
 6. Confira o quadro **Sua contribuição** e confirme.
 
@@ -110,21 +110,25 @@ Ao final, a tela **Doação registrada** mostra o resumo: campanha, doador, valo
 
 📷 *Captura pendente:* `img/doador/06-confirmacao.png`
 
-> **Importante:** na demonstração aparece o aviso *"Dados fictícios · nenhum valor é cobrado"*.
->
-> **Diferença entre a demonstração e o MVP.** A demonstração mostra PIX, cartão, boleto e doação de itens. As regras do MVP e o backend atual aceitam somente **PIX** como forma de pagamento, e o PIX real depende da definição do gateway (pendência PV01 em [`arquitetura.md`](../arquitetura.md)). Revise esta seção quando o fluxo real for integrado.
+> **Importante:** na demonstração aparece o aviso *"Dados fictícios · nenhum valor é cobrado"*. No MVP, o PIX é simulado; o gateway de pagamento está fora do MVP, sem data prevista.
 
 Você também pode doar direto para uma **entidade aprovada**, sem escolher uma campanha.
 
 ---
 
-## 5. Comprovante e histórico 🕒 Previsto
+## 5. Comprovante e histórico ✅ Disponível
 
-Depois de doar, o sistema gera um **código de comprovante** com data, valor, destino e forma de pagamento. Em **Minhas doações** você poderá consultar todas as doações feitas por você.
+Depois de doar, o sistema gera um **código de comprovante** com data, valor, destino e forma de pagamento.
+
+1. No menu, abra **Minhas doações**.
+2. Você vê todas as doações registradas na sessão.
+3. Clique em uma doação para abrir os detalhes e o comprovante.
+
+📷 *Captura pendente:* `img/doador/07-historico.png`
 
 Doações confirmadas **não podem ser editadas nem excluídas**. Se houver erro, entre em contato com a entidade ou com a equipe DoaSync.
 
-📷 *Captura pendente:* `img/doador/07-historico.png`
+> Na demonstração, os registros ficam na memória da sessão e somem ao recarregar a página.
 
 ---
 
@@ -150,4 +154,14 @@ Em doações **não anônimas**, a entidade vê somente o seu **nome**. E-mail, 
 | Posso doar sem escolher campanha? | Sim, para uma entidade aprovada |
 | Posso cancelar uma doação confirmada? | Não. Entre em contato com a entidade |
 | A entidade vê meu CPF? | Não |
-| Posso doar com cartão ou boleto? | A demonstração mostra essas opções, mas o MVP prevê somente PIX |
+| Posso doar com cartão ou boleto? | Não. O MVP prevê somente PIX. As opções na demonstração servem só para teste |
+| Esqueci minha senha. O que faço? | Procure o administrador da plataforma (limitação L4) |
+
+## Limitações conhecidas
+
+| ID | Limitação |
+|---|---|
+| L1 | Não há tela de cadastro de doador. O cadastro existe na API (`POST /api/v1/doadores`), mas não na interface (F1) |
+| L2 | O link **Esqueceu minha senha?** não tem função. Não há recuperação de senha na API; para redefinir, procure o administrador (B2) |
+| L3 | As campanhas e doações da demonstração não vêm da API em todas as telas; parte usa dados fictícios em memória (F5) |
+| L4 | A recuperação de senha não existe no backend. Procure o administrador da plataforma |
