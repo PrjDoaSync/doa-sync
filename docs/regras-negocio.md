@@ -6,6 +6,8 @@ Identificar as regras, condições e comportamentos que deverão ser considerado
 
 As regras foram levantadas a partir dos requisitos funcionais definidos para a solução, considerando os processos de usuários, entidades, campanhas, doações, acompanhamento e administração.
 
+> **Numeração de RF:** a origem das regras usa RF01–RF26 de [`funcionalidades.md`](./funcionalidades.md). A numeração oficial é RF-001–RF-030 de [`requisitos.md`](./requisitos.md), e a equivalência entre as duas está em [`funcionalidades.md`](./funcionalidades.md#equivalência-de-numeração).
+
 > ⚠️ As regras marcadas como **VALIDAR COM O CLIENTE** representam comportamentos que podem ser necessários para o funcionamento da solução, mas que não estão completamente definidos nos requisitos atuais.
 
 ---
@@ -239,13 +241,13 @@ Após a conclusão do processo, o sistema deve emitir uma confirmação da doaç
 
 O doador autenticado pode optar por ocultar sua identidade na exibição pública e na consulta da entidade. O registro permanece associado à conta do próprio doador para histórico e rastreabilidade interna, conforme RN72, RF-020 e RNF-006. O cadastro rápido, se apresentado, deve concluir cadastro e autenticação antes do envio da doação.
 
-**Origem:** RF19
+**Origem:** RF19 (equivale a RF-021 em `requisitos.md`)
 
 ---
 
 ### RN23 — Método de pagamento
 
-O MVP aceita exclusivamente **PIX**, conforme RN70. Cartão de crédito e boleto ficam para avaliação posterior. No cenário atual descrito no [contrato da API](./backend/rotas-api.md), o registro e a confirmação de PIX são simulados até a definição do gateway.
+O MVP aceita exclusivamente **PIX**, conforme RN70. Cartão de crédito e boleto ficam para avaliação posterior. No cenário atual descrito no [contrato da API](./backend/contrato-api.md), o registro e a confirmação de PIX são simulados até a definição do gateway.
 
 **Origem:** RF20
 

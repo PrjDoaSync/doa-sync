@@ -21,7 +21,7 @@ Este documento entrega ao desenvolvimento do front-end Web:
 | Documentos do `doasync-frontend` (`docs/frontend-cam-doa.md`, `frontend-ges-fechamento.md`, `frontend-design-base.md`, `componentes.md`) | Nós (`node-id`) dos frames do Figma e tokens confirmados no Figma |
 | [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) | Tokens, componentes e acessibilidade previstos |
 | [`qa/relatorio-qa-shiftleft-sprint2.md`](../qa/relatorio-qa-shiftleft-sprint2.md) §4.2 e §4.3 | Comportamento em erros HTTP, rede e estados ausentes |
-| [`backend/rotas-api.md`](../backend/rotas-api.md) | Formato dos erros da API |
+| [`backend/contrato-api.md`](../backend/contrato-api.md) | Formato dos erros da API |
 | [`requisitos.md`](../requisitos.md) | RNF-010, RNF-011, RNF-012 e RNF-014 |
 
 ### 1.2 Classificação das decisões
@@ -39,19 +39,19 @@ Este documento entrega ao desenvolvimento do front-end Web:
 
 > **Correção em relação à versão anterior deste documento.** A versão anterior analisava a branch `dev-frontend` (Next.js, cores verde e amarelo, primeiro semestre). Ela **não** faz parte do projeto atual e foi removida da análise. A referência passa a ser o `doasync-frontend`, conforme a stack definida em [`stack.md`](../stack.md).
 
-Verificado em `doasync-frontend`, branch `develop`, commit `75f14fc`:
+Verificado em `doasync-frontend`, branch `develop`, commit `75f14fc`. Os itens HTTP e Dados foram atualizados no commit `1c8eaa8` (24/11/2026), depois do PR #143:
 
 | Item | Valor |
 |---|---|
 | Pasta | `web/` |
 | Framework | React 19 + Vite 8, JavaScript/JSX (sem TypeScript) |
 | Rotas | React Router 7 |
-| HTTP | Axios, `timeout` de 15 s, URL base em `VITE_API_URL` (padrão `http://localhost:8080/api`) |
+| HTTP | Axios, `timeout` de 15 s, URL base em `VITE_API_URL` (padrão `http://localhost:8080/api/v1`) |
 | Estilos | CSS próprio, com variáveis em `src/styles/tokens.css`. **Não usa Tailwind** |
 | Fonte | Inter 4.1 variável, hospedada em `public/fonts` (licença OFL) |
 | Ícones | SVG próprio em `components/Ui.jsx` (componente `Icon`). **Não usa Phosphor** |
 | Testes | Vitest + React Testing Library |
-| Dados | Modo demonstração: dados em memória (`DemoProvider`), sem chamar a API |
+| Dados | A vitrine pública (Home, Explorar e Detalhe, em `pages/Publico.jsx`) chama a API pelo hook `useCampanhasPublicas`. A área de gestão segue em modo demonstração, com dados em memória (`DemoProvider`) |
 | Mobile | Não há app mobile neste repositório |
 
 O [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md) cita Tailwind CSS e Phosphor Icons como base. Isso **não corresponde** ao código atual (ver seção 10, item D-07).
@@ -186,19 +186,19 @@ Os componentes de estado **já existem** no `doasync-frontend`. Esta seção des
 | Situação (status) | `StatusBadge` | Tons `sucesso`, `alerta`, `perigo` e `neutro` por texto do status |
 | Ação em andamento | `useAsyncAction` | Expõe `pending`, `success`, `error`; **ignora cliques duplicados** com uma trava interna |
 | Progresso | `Progresso` | `role="progressbar"` com `aria-valuenow`, `aria-valuemin` e `aria-valuemax` |
-| Erro de rede | `normalizeError` (`services/api.js`) | Converte o erro do Axios em `{ status, message, data, cancelled }`. Mensagens fixas: "Não foi possível conectar ao servidor." e "Tempo de resposta esgotado." |
+| Erro da API e de rede | `normalizeError` (`services/api.js`) | Converte o erro do Axios em `{ status, message, data, campos, cancelled }`. A `message` vem de `data.message`, `data.error` ou da primeira mensagem de `data.erros`; os erros por campo do 422 ficam em `campos`. Mensagens fixas: "Não foi possível conectar ao servidor." e "Tempo de resposta esgotado." |
 
 ### 5.2 Lacunas verificadas no código
 
 | # | Lacuna | Referência |
 |---|---|---|
 | 1 | **Não há skeleton nem spinner.** O loading é só texto. O CSS não define animação de carga | QA §4.3 pede skeleton de cards e botão com spinner |
-| 2 | **`useAsyncAction` não é usado por nenhuma página.** Hoje só `Campanhas`, `Doacoes` e `Entidades` usam `RequestState` | QA §4.3 exige bloquear duplo clique em todo envio (RNF-008) |
+| 2 | **`useAsyncAction` não é usado por nenhuma página.** Hoje só `Campanhas`, `Doacoes`, `Entidades` e `Publico` (Home, Explorar e Detalhe) usam `RequestState` | QA §4.3 exige bloquear duplo clique em todo envio (RNF-008) |
 | 3 | **`Toast` não fecha sozinho**, enquanto o Design System define 4 segundos | DS §7.8 |
-| 4 | **Não há tratamento por código HTTP.** `normalizeError` só repassa `status` e `message`. Não existe redirecionamento em 401 nem tela de acesso negado em 403 | QA §4.2 (seção 6 abaixo) |
-| 5 | **O formato de erro não bate com o contrato.** `normalizeError` lê `data.message`, mas a API devolve `{ "error": "..." }` e `{ "erros": { "campo": "..." } }`. Resultado: o texto de um 401 ou 409 não aparece (a tela mostra "Erro 401 ao processar a requisição.") e os erros por campo do 422 se perdem | `rotas-api.md` |
+| 4 | **Não há tratamento por código HTTP.** `normalizeError` repassa `status`, `message` e `campos`, mas não existe redirecionamento em 401 nem tela de acesso negado em 403 | QA §4.2 (seção 6 abaixo) |
+| 5 | **Resolvida (D-03).** `normalizeError` já lê `{ "error": "..." }` e `{ "erros": { "campo": "..." } }`, além de `message`. Falta as telas de formulário usarem `campos` para marcar os erros do 422 | `contrato-api.md` |
 | 6 | **Não há aviso de perda de conexão** nem salvamento local dos formulários | QA §4.2 |
-| 7 | **As telas rodam com dados de demonstração.** Por isso, loading e erro de rede praticamente não aparecem hoje. Eles passam a valer quando as telas forem ligadas à API | `web/README.md` do front |
+| 7 | **A área de gestão roda com dados de demonstração.** Nela, loading e erro de rede praticamente não aparecem. Na vitrine pública, que já chama a API, os dois estados já ocorrem | `web/README.md` do front |
 
 ### 5.3 Comportamento padrão por estado
 
@@ -206,7 +206,7 @@ Os componentes de estado **já existem** no `doasync-frontend`. Esta seção des
 |---|---|---|
 | Botão enviando | Trocar o texto pelo verbo no gerúndio com reticências (ex.: "Publicando...") e **desabilitar o botão** para impedir envio duplicado | Oficial (QA §4.3) |
 | Lista carregando | Skeleton com o mesmo formato do conteúdo final (mesma altura de card), sem salto de layout | Oficial (QA §4.3), não implementado |
-| Carga muito rápida | Só mostrar o skeleton se a resposta passar de 300 ms | Proposta |
+| Carga muito rápida | Atraso do skeleton: só mostrar se a resposta passar de 300 ms | Proposta (igual ao DS §7.9) |
 | Carga demorada | Após 10 s, manter o indicador e mostrar "Isso está demorando mais que o normal..." com "Tentar novamente" | Proposta |
 | Vazio absoluto | Explicar o que fazer e, se houver, uma ação ("Você ainda não fez nenhuma doação" + "Explore as campanhas...") | Implementado em parte |
 | Vazio por filtro | "Nenhum resultado" com opção de limpar filtros. Diferente do vazio absoluto | Proposta |
@@ -229,7 +229,7 @@ Critério da issue: mensagem padrão para 401, 403, 404, 409, 422 e 500. A colun
 | **403** | Perfil sem permissão para o recurso | Tela de erro de permissão, **sem deslogar** o usuário, com botão para voltar ao início | "Você não tem permissão para acessar esta página." | Comportamento: QA §4.2. Texto: proposta | Não |
 | **404** | Recurso inexistente ou não visível ao usuário | `Vazio` principal com título do recurso e link de retorno | "Página não encontrada" (rota inexistente). "Campanha não encontrada" ou "Doação não encontrada" (registro), com o texto "Verifique o endereço ou volte para a lista de campanhas." | Padrão já usado no código | **Sim**, para rota inexistente e para campanha ou doação não encontrada |
 | **409** | Duplicidade ou estado inválido (ex.: campanha já encerrada, CNPJ já cadastrado) | Banner de aviso **contextual** (`Aviso` de erro) no formulário ou na tela, e erro no campo quando o conflito é de um campo | "Esta campanha já foi encerrada e não aceita novas doações." / "CNPJ já cadastrado." | QA §4.2 | Não |
-| **422** | Validação de campos | **Borda vermelha** no campo e texto explicativo abaixo. Mover o foco para o primeiro campo com erro | Mensagem do campo vinda da API (`erros.campo`) | QA §4.2 | Não (as telas validam no front, sem usar `erros`) |
+| **422** | Validação de campos | **Borda vermelha** no campo e texto explicativo abaixo. Mover o foco para o primeiro campo com erro | Mensagem do campo vinda da API (`erros.campo`) | QA §4.2 | Em parte: `normalizeError` já expõe `erros` em `campos` (D-03), mas as telas validam no front e ainda não marcam os campos com a resposta da API |
 | **500** | Falha inesperada no servidor | **Modal centralizado** com a mensagem. **Nunca** exibir stack trace ou texto técnico (RNF-011) | "Desculpe, ocorreu uma instabilidade em nossos servidores. Nossa equipe já foi notificada." | QA §4.2 | Não |
 | **Sem resposta** | Servidor fora do ar ou sem rede | `ErrorMessage` com "Tentar novamente" | "Não foi possível conectar ao servidor." | `normalizeError` | **Sim** (texto) |
 | **Timeout** | Passou de 15 s | `ErrorMessage` com "Tentar novamente" | "Tempo de resposta esgotado." | `normalizeError` | **Sim** (texto) |
@@ -240,14 +240,14 @@ Critério da issue: mensagem padrão para 401, 403, 404, 409, 422 e 500. A colun
 
 ### 6.1 Formato do erro que a interface deve ler
 
-Contrato documentado em [`rotas-api.md`](../backend/rotas-api.md):
+Contrato documentado em [`contrato-api.md`](../backend/contrato-api.md):
 
 | Situação | Corpo da resposta |
 |---|---|
 | 400, 401, 403, 404, 500 e alguns 409 | `{ "error": "mensagem" }` |
 | 422 e alguns 409 | `{ "erros": { "campo": "mensagem" } }` |
 
-Para a tabela acima funcionar, `normalizeError` precisa ler `data.error` e `data.erros`, além de `data.message`. Isso é a pendência D-03.
+`normalizeError` já lê `data.error` e `data.erros`, além de `data.message` (pendência D-03, resolvida).
 
 ---
 
@@ -374,7 +374,7 @@ Tom: direto, acolhedor, sem jargão técnico e sem culpar o usuário (RNF-011). 
 |---|---|---|---|
 | D-01 | Confirmar o **arquivo oficial do Figma** (`3eBaQzgx…` ou `JaIKR7tT…`), confirmar que os links abrem e padronizar os documentos | Produto/UX | Seção 3 |
 | D-02 | Identificar ou criar os **frames mobile** (390 px) e registrar os links | Produto/UX | Critério da issue #72 |
-| D-03 | Ajustar `normalizeError` (ou o contrato) para o front ler `error` e `erros`, e não só `message` | Front-end e Back-end | Seção 6 |
+| D-03 | ~~Ajustar `normalizeError` (ou o contrato) para o front ler `error` e `erros`, e não só `message`~~ **Resolvida:** `normalizeError` já lê os dois formatos | Front-end | — |
 | D-04 | Tratar **401** (redirecionar ao login) e **403** (tela de acesso negado) de forma central | Front-end | Seção 6 |
 | D-05 | `Toast` não fecha sozinho, e o Design System define 4 s. Decidir qual vale | UX | DS §7.8 |
 | D-06 | Implementar **skeleton**, spinner em botão, aviso offline e usar `useAsyncAction` nos envios | Front-end | Seção 5.2 |
@@ -392,7 +392,7 @@ Tom: direto, acolhedor, sem jargão técnico e sem culpar o usuário (RNF-011). 
 | Critério (issue #191) | Onde | Situação |
 |---|---|---|
 | `DESIGN-SYSTEM.md` com tokens, componentes e estados | Tokens e componentes já existiam. Os **estados** estão na nova seção 7.9 do [`DESIGN-SYSTEM.md`](./DESIGN-SYSTEM.md). A correspondência com o projeto está na seção 4 deste documento | Atendido |
-| Mensagens padrão por código HTTP (401, 403, 404, 409, 422, 500) | Seção 6 | Atendido. Falta implementar no front (D-03, D-04) |
+| Mensagens padrão por código HTTP (401, 403, 404, 409, 422, 500) | Seção 6 | Atendido. Falta implementar no front (D-04) |
 | Links para as telas no Figma | Seção 3: 30 frames desktop | Parcial. Frames mobile e arquivo oficial pendentes (D-01, D-02). Os endereços respondem HTTP 200, mas o acesso ao conteúdo exige login e **não foi verificado** |
 | Objetivo: cobrir os estados pedidos no relatório de QA §4.2 e §4.3 | Seções 5, 6, 7 e 8 | Atendido |
 
@@ -420,4 +420,4 @@ Marcar na entrega de cada tela pelo front-end e na revisão do QA.
 
 ## 13. Manutenção
 
-Atualize este documento quando: uma tela for ligada à API (rever a seção 7.1), `tokens.css` mudar, o Design System definir os estados hoje marcados como proposta, o formato de erro da API mudar (D-03), ou os frames do Figma forem atualizados ou reorganizados. Não registre como implementado o que não foi verificado no código do `doasync-frontend`.
+Atualize este documento quando: uma tela for ligada à API (rever a seção 7.1), `tokens.css` mudar, o Design System definir os estados hoje marcados como proposta, o formato de erro da API mudar, ou os frames do Figma forem atualizados ou reorganizados. Não registre como implementado o que não foi verificado no código do `doasync-frontend`.

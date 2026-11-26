@@ -188,7 +188,7 @@ A altura dos botões dita o ritmo da interface.
 *   **Borda e Fundo:** Bg `color.bg.surface`, Border `color.border.strong`.
 *   **Typography:** Texto interno `font.body` (16px para evitar zoom automático no iOS).
 *   **Focus:** Border `color.border.focus`, sombra interna leve (`ring-1 ring-blue-500`).
-*   **Error State:** Border vermelha (`border-red-500`), ícone de aviso interno à direita, texto de erro `font.caption` em vermelho abaixo do campo.
+*   **Error State:** Borda na cor `--perigo`, ícone de aviso interno à direita, texto de erro `font.caption` em vermelho abaixo do campo.
 
 ### 7.3 Cards
 *   Usados amplamente nas áreas de Gestão e Dashboard[cite: 1, 4].
@@ -229,10 +229,10 @@ Toda tela que depende de dados ou de uma ação do usuário deve tratar estes es
 
 | Estado | Regra | Acessibilidade |
 | :--- | :--- | :--- |
-| **Loading de lista ou página** | Skeleton com o mesmo formato do conteúdo final (mesma altura de card), sem salto de layout. Só aparece se a resposta passar de 300 ms | Contêiner com `aria-busy="true"` e texto "Carregando..." em `role="status"` |
+| **Loading de lista ou página** | Skeleton com o mesmo formato do conteúdo final (mesma altura de card), sem salto de layout. Atraso do skeleton (proposta): só mostrar se a resposta passar de 300 ms | Contêiner com `aria-busy="true"` e texto "Carregando..." em `role="status"` |
 | **Loading de botão** | Texto no gerúndio ("Publicando..."), spinner e botão `disabled`. Impede envio duplicado | `aria-busy="true"` no botão |
 | **Vazio** | Ícone, título, texto de apoio e, quando útil, uma ação. Distinguir vazio absoluto ("Você ainda não fez nenhuma doação") de vazio por filtro ("Nenhum resultado" + "Limpar filtros") | Título como `h1` (tela inteira) ou `h2` (bloco); `role="status"` nas tabelas |
-| **Erro de campo** | Borda `border-red-500`, ícone e texto `font.caption` em `feedback.error` abaixo do campo | `aria-invalid="true"` e `aria-describedby` apontando para a mensagem |
+| **Erro de campo** | Borda na cor `--perigo`, ícone e texto `font.caption` em `feedback.error` abaixo do campo | `aria-invalid="true"` e `aria-describedby` apontando para a mensagem |
 | **Erro de formulário ou de carga** | Alerta in-page (7.8) ou bloco de erro com "Tentar novamente". Mantém o cabeçalho da tela | `role="alert"` |
 | **Erro de servidor (500)** | Modal centralizado com mensagem amigável. Nunca exibir detalhe técnico | Foco movido para o modal |
 | **Sucesso de ação simples** | Toast de sucesso | `role="status"` |

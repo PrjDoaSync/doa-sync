@@ -4,7 +4,7 @@
 
 Este guia leva uma pessoa que nunca viu o projeto a subir o **back-end (API Spring Boot)** e o **front-end (React + Vite)** na própria máquina, usando só as instruções abaixo.
 
-O guia descreve o código **vigente** da branch `develop` dos repositórios `doasync-backend` e `doasync-frontend`, conforme a stack oficial em [`stack.md`](./stack.md). A branch `dev-backend` (.NET, semestre anterior) **não** faz parte do projeto atual e não é usada aqui.
+O guia descreve o código **vigente** da branch `main` do `doasync-backend` (que está à frente da `develop`) e da branch `develop` do `doasync-frontend`, conforme a stack oficial em [`stack.md`](./stack.md). A branch `dev-backend` (.NET, semestre anterior) **não** faz parte do projeto atual e não é usada aqui.
 
 ## 1. Visão geral
 
@@ -15,8 +15,8 @@ O guia descreve o código **vigente** da branch `develop` dos repositórios `doa
 
 Dois pontos que evitam confusão:
 
-- No `doasync-backend`, a pasta `backend/` contém **duas aplicações**: a API Spring Boot (oficial, `pom.xml`) e uma API Node/Express anterior (`package.json`, `src/server.js`). A situação da Express está em decisão (PV-Express, ver [`stack.md`](./stack.md)). **Use a Spring Boot**. As duas usam a porta 8080 e não devem rodar juntas.
-- **Hoje o front não consome a API.** As telas usam dados de demonstração em memória. O guia sobe os dois lados para que a integração possa ser feita, mas você não verá dados da API na tela do front (ver seção 6).
+- No `doasync-backend`, a pasta `backend/` contém **duas aplicações**: a API Spring Boot (oficial, `pom.xml`) e uma API Node/Express anterior (`package.json`, `src/server.js`). A Express é a API inicial da Sprint 1 (CAM-T04): só lê campanhas de fixtures em memória e não acessa banco. O papel dela está em decisão (PV-Express, ver [`stack.md`](./stack.md)). **Use a Spring Boot**. As duas usam a porta 8080 e não devem rodar juntas.
+- **O front consome a API só na vitrine pública.** Home, Explorar e Detalhe da campanha buscam as campanhas na API Spring Boot. Login, doação e a área de gestão ainda usam dados de demonstração em memória (ver seção 6).
 
 ## 2. Pré-requisitos
 
@@ -35,10 +35,10 @@ O `doasync-backend` é um repositório **privado**: peça ao líder do grupo par
 
 ## 3. Obter o código
 
-A branch de trabalho de ambos os repositórios é a `develop`.
+No back-end, use a `main`, que está à frente da `develop` e já traz a correção de CORS da seção 6. No front, use a `develop`.
 
 ```bash
-git clone --branch develop https://github.com/PrjDoaSync/doasync-backend.git
+git clone --branch main https://github.com/PrjDoaSync/doasync-backend.git
 git clone --branch develop https://github.com/PrjDoaSync/doasync-frontend.git
 ```
 
@@ -66,13 +66,13 @@ O comportamento muda conforme os **perfis** ativos:
 | Perfil | Banco | Uso | Observações |
 |---|---|---|---|
 | `dev` | H2 **em memória** (apagado ao parar) | Desenvolvimento no dia a dia | Liga o servidor HTTP, o Swagger e cria um administrador de desenvolvimento. Segredo JWT de desenvolvimento embutido. |
-| `consulta` | — | Complemento | Liga o servidor HTTP em `127.0.0.1:8080` e libera CORS para `http://localhost:5173` e `http://127.0.0.1:5173`. |
+| `consulta` | — | Complemento | Liga o servidor HTTP em `127.0.0.1:8080`. |
 | `local` | H2 em **arquivo** (`backend/data/`, ignorado pelo Git) | Dados persistentes locais sem PostgreSQL | **Sozinho não abre HTTP.** Combine com `consulta` (`local,consulta`). Não cria administrador. |
 | `postgres` | PostgreSQL via variáveis `DB_URL`, `DB_USER`, `DB_PASSWORD` | Usar um PostgreSQL próprio | Não define segredo JWT: é preciso informar `DOASYNC_JWT_SEGREDO`. Combine com `consulta` para HTTP local. |
 | `prod` | PostgreSQL | Homologação, produção e Docker Compose | Exige `DOASYNC_JWT_SEGREDO` e, se não houver administrador no banco, `ADMIN_EMAIL` e `ADMIN_PASSWORD`. |
 | `test` | H2 | Testes automatizados | Usado pelo Maven. Não ative à mão. |
 
-O comando `./mvnw spring-boot:run` ativa `dev,consulta` por padrão (definido no `pom.xml`). O banco é criado e versionado pelas migrations do **Flyway** (`db/migration`, V1 a V4), aplicadas automaticamente ao subir.
+O comando `./mvnw spring-boot:run` ativa `dev,consulta` por padrão (definido no `pom.xml`). O banco é criado e versionado pelas migrations do **Flyway** (`db/migration`, V1 a V6; a V5 é uma migração em Java, em `src/main/java/db/migration`), aplicadas automaticamente ao subir.
 
 ### 4.2 Caminho A — Início rápido com H2 (recomendado)
 
@@ -191,8 +191,9 @@ O back-end **não tem `.env.example`**: as variáveis são lidas dos arquivos `a
 | `SWAGGER_ENABLED` | Liga/desliga o Swagger | `true` | nunca (perfil `prod`) |
 | `PORT` | Porta HTTP | `8080` | nunca. **Não tem efeito com o perfil `consulta`**, que fixa 8080 em `127.0.0.1` |
 | `POSTGRES_PASSWORD` | Senha do PostgreSQL no Compose | valor local do `compose.yaml` | nunca (só para trocar o padrão) |
-
-Origens liberadas no CORS: propriedade `campanhas.cors.origins` (padrão `http://localhost:5173,http://127.0.0.1:5173`).
+| `DOASYNC_CORS_ORIGINS` | Origens do navegador liberadas no CORS de `/api/v1/**`, separadas por vírgula | `http://localhost:5173,http://127.0.0.1:5173` | nunca (só para outra origem do front) |
+| `DOASYNC_AGENDAMENTO_HABILITADO` | Liga a rotina que atualiza o status das campanhas pelas datas (RN59, RN60) | `true` | nunca |
+| `DOASYNC_CAMPANHAS_STATUS_CRON` | Horário da rotina acima (expressão cron do Spring, fuso UTC). Ela também roda ao subir a API | `0 5 0 * * *` (todo dia às 00h05) | nunca |
 
 ### 4.6 Testes do back-end
 
@@ -223,7 +224,7 @@ Use `npm ci` (e não `npm install`) para instalar exatamente as versões do `pac
 | `/explorar` | Campanhas com busca, filtros e paginação |
 | `/campanhas/:id` | Detalhe da campanha |
 | `/doar/:id` | Fluxo de doação em etapas (demonstração) |
-| `/login` | Login (indisponível: integração pendente) |
+| `/login` | Login (só acesso de demonstração: integração pendente) |
 | `/dashboard` | Painel de gestão da entidade |
 
 A lista completa de rotas está no `web/README.md` do repositório do front.
@@ -233,24 +234,24 @@ A lista completa de rotas está no `web/README.md` do repositório do front.
 O front tem um arquivo de exemplo, o `web/.env.example`:
 
 ```text
-VITE_API_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:8080/api/v1
 ```
 
 | Variável | Para que serve | Observação |
 |---|---|---|
-| `VITE_API_URL` | URL base do cliente HTTP (Axios) | Se não for definida, o código usa o mesmo valor do exemplo. **Hoje nenhuma tela chama a API**, então a variável não muda o que você vê. |
+| `VITE_API_URL` | URL base do cliente HTTP (Axios) | Se não for definida, o código usa o mesmo valor do exemplo (`src/services/config.js`). Afeta as telas da vitrine (Home, Explorar e Detalhe), que já chamam a API. |
 
-Para sobrescrever, copie o exemplo para **`.env.local`** (e não para `.env`):
+Para sobrescrever, copie o exemplo para **`.env.development.local`** (e não para `.env`), como recomenda o próprio `.env.example`. Esse arquivo vale só para o `npm run dev` e não é lido pelos testes:
 
 ```bash
-cp .env.example .env.local          # Bash
+cp .env.example .env.development.local          # Bash
 ```
 
 ```powershell
-Copy-Item .env.example .env.local   # PowerShell
+Copy-Item .env.example .env.development.local   # PowerShell
 ```
 
-> 🔒 O repositório do front **não ignora o arquivo `.env`** no `.gitignore` (só os arquivos terminados em `.local`). Por isso, use sempre `.env.local`. Nunca coloque segredos em variáveis `VITE_*`: elas vão para o código enviado ao navegador.
+> 🔒 O repositório do front **não ignora o arquivo `.env`** no `.gitignore` (só os arquivos terminados em `.local`). Por isso, use sempre `.env.development.local`. Nunca coloque segredos em variáveis `VITE_*`: elas vão para o código enviado ao navegador.
 
 ### 5.2 Comandos do front-end
 
@@ -275,11 +276,11 @@ Abra dois terminais:
 
 | Item | Situação atual |
 |---|---|
-| Telas do front | Carregam dados fictícios de um `DemoProvider` em memória. Alterações somem ao recarregar a página. Login, e-mail de recuperação, upload de imagens e pagamento **não são reais**. |
-| Integração front ↔ API | **Pendente.** Existe o cliente Axios e a variável `VITE_API_URL`, mas nenhuma página os usa. Os endereços dos services são hipóteses, ainda não conferidas com o contrato da API. |
-| Rotas da API disponíveis hoje | `POST /api/v1/auth/login`, `GET /api/v1/campanhas` e `GET /api/v1/campanhas/{id}` (a listagem também responde em `/api/campanhas`). Os demais endpoints de [`rotas-api.md`](./backend/rotas-api.md) ainda não estão no código verificado. |
+| Vitrine do front (Home, Explorar, Detalhe) | **Integrada.** Busca as campanhas em `GET /api/v1/campanhas` e `GET /api/v1/campanhas/{id}` (hook `useCampanhasPublicas`, PR #143 do front). Com o banco vazio do caminho A, a vitrine aparece sem campanhas. |
+| Demais telas do front | Login, doação e área de gestão carregam dados fictícios de um `DemoProvider` em memória. Alterações somem ao recarregar a página. Login, e-mail de recuperação, upload de imagens e pagamento **não são reais**. |
+| Rotas da API disponíveis hoje | Autenticação (`POST /api/v1/auth/login`), cadastro de doador (`POST /api/v1/doadores`), perfil (`GET` e `PATCH /api/v1/usuarios/me`), entidades (`/api/v1/entidades`, incluindo status, doações recebidas e arrecadação), campanhas (`/api/v1/campanhas`, leitura pública e escrita pela entidade), doações (`POST /api/v1/doacoes`, `GET /api/v1/doacoes/{id}`, `GET /api/v1/usuarios/me/doacoes`), usuários do admin (`GET /api/v1/usuarios`, `PATCH /api/v1/usuarios/{id}/status`) e indicadores (`GET /api/v1/dashboard/kpis`). Detalhes em [`contrato-api.md`](./backend/contrato-api.md). |
 | Banco no caminho A | H2 em memória, **vazio**: a listagem de campanhas volta sem itens e tudo é apagado ao parar a API. |
-| CORS | A API aceita requisições do navegador apenas de `localhost:5173` e `127.0.0.1:5173`. Outra origem (por exemplo a porta 3000) recebe `403`. |
+| CORS | Na `main` do back-end, o CORS cobre todo `/api/v1/**` com `GET`, `HEAD`, `POST`, `PATCH` e `OPTIONS` e os cabeçalhos `Accept`, `Content-Type`, `Authorization` e `Idempotency-Key`. Assim o login e as demais chamadas funcionam a partir do navegador em `:5173`. As origens vêm de `DOASYNC_CORS_ORIGINS` (padrão `localhost:5173` e `127.0.0.1:5173`); outra origem, por exemplo a porta 3000, é recusada. O alias legado `/api/campanhas` continua só leitura. A `develop` do back-end ainda não tem essa correção e só libera `GET`, `HEAD` e `OPTIONS` nas rotas de campanhas. |
 
 ## 7. Solução de problemas
 
@@ -294,8 +295,8 @@ Abra dois terminais:
 | API com perfil `prod` não inicia sem administrador | Faltam `ADMIN_EMAIL` e `ADMIN_PASSWORD` | Defina as duas variáveis |
 | Erro de conexão com o banco (perfil `postgres`) | PostgreSQL parado, `DB_URL` ou credenciais incorretas | Confira o serviço e as variáveis da seção 4.4 |
 | `Cannot connect to the Docker daemon` ou erro em `dockerDesktopLinuxEngine` | Docker não está em execução | Inicie o Docker Desktop (ou o serviço do Docker) e repita |
-| Navegador bloqueia chamadas à API (erro de CORS) | Front rodando em outra porta (o Vite usa a próxima livre se a 5173 estiver ocupada) | Libere a porta 5173 ou inclua a origem em `campanhas.cors.origins` |
-| Front mostra dados que não vêm da API | É o esperado: usa dados de demonstração | Ver seção 6 |
+| Navegador bloqueia chamadas à API (erro de CORS) | Front rodando em outra porta (o Vite usa a próxima livre se a 5173 estiver ocupada) | Libere a porta 5173 ou inclua a origem em `DOASYNC_CORS_ORIGINS` |
+| Área de gestão mostra dados que não vêm da API | É o esperado: só a vitrine está integrada | Ver seção 6 |
 | `npm ci` falha ou testes quebram | Versão antiga do Node.js ou `npm install` no lugar de `npm ci` | Use Node.js 22 ou 24 e `npm ci` |
 
 ## 8. Segurança e segredos
@@ -303,7 +304,7 @@ Abra dois terminais:
 - Nenhum valor real de segredo pertence a este documento nem ao repositório. Os exemplos usam espaços reservados (`SEU_...`, `<...>`).
 - Os valores padrão que existem nos arquivos `application-dev.properties`, `application-local.properties` e `compose.yaml` servem **só** para a sua máquina. Nunca os reutilize em homologação ou produção.
 - Em homologação e produção, informe `DOASYNC_JWT_SEGREDO`, `DB_PASSWORD`, `ADMIN_PASSWORD` por variáveis de ambiente ou cofre de segredos, nunca por arquivo versionado.
-- No back-end, o `.env` está no `.gitignore`. No front, use `.env.local` (seção 5.1).
+- No back-end, o `.env` está no `.gitignore`. No front, use `.env.development.local` (seção 5.1).
 
 ## 9. Validação deste guia
 
@@ -334,8 +335,8 @@ Os comandos foram executados em uma máquina **Windows com PowerShell**, partind
 
 - Este guia cobre a **instalação e execução do projeto inteiro**. O guia de **uso e a API do módulo de Campanhas** (criar, editar, publicar, encerrar, buscar, compartilhar) pertence à issue #171 (CAM-T20), da Equipe 2, e não é duplicado aqui.
 - Testes e pipelines: [`backend/pipeline-ci-cd.md`](./backend/pipeline-ci-cd.md) e [`frontend/frontend-testes-unitarios.md`](./frontend/frontend-testes-unitarios.md).
-- Contrato da API: [`backend/rotas-api.md`](./backend/rotas-api.md). Stack e decisões pendentes: [`stack.md`](./stack.md) e [`arquitetura.md`](./arquitetura.md).
+- Contrato da API: [`backend/contrato-api.md`](./backend/contrato-api.md). Stack e decisões pendentes: [`stack.md`](./stack.md) e [`arquitetura.md`](./arquitetura.md).
 
 ## 11. Manutenção
 
-Atualize este guia quando mudar: um perfil ou variável do Spring, a porta ou origem do CORS, o Node ou JDK exigidos, o contrato do `.env.example`, ou quando o front passar a consumir a API (seção 6). Confira os valores nos arquivos `application*.properties`, `compose.yaml`, `package.json` e `.env.example` antes de editar.
+Atualize este guia quando mudar: um perfil ou variável do Spring, a porta ou origem do CORS, o Node ou JDK exigidos, o contrato do `.env.example`, ou quando mais telas do front passarem a consumir a API (seção 6). Confira os valores nos arquivos `application*.properties`, `compose.yaml`, `package.json` e `.env.example` antes de editar.

@@ -4,6 +4,8 @@
 > **Tarefa:** `[DOC-07]` (#186)  
 > **Objetivo:** Padronizar a terminologia utilizada entre as equipes de Documentação, Produto/UX (Figma), Desenvolvimento (Back-end/Front-end) e Qualidade (QA), eliminando ambiguidades nos requisitos, código e interfaces.
 
+> **Fonte dos valores de enum:** os tipos de usuário e os status citados abaixo foram conferidos no código do `doasync-backend` (`main`): `TipoUsuario`, `StatusDoacao`, `StatusEntidade` e `StatusCampanha`. Termos marcados como **fora do MVP** descrevem funcionalidades previstas no levantamento que não fazem parte do escopo atual (ver [definicao-mvp.md](./definicao-mvp.md)).
+
 ---
 
 ## 1. Desambiguação de Termos Críticos entre Equipes
@@ -12,59 +14,70 @@ A tabela abaixo estabelece o **termo canônico oficial** do projeto frente às v
 
 | Termo Oficial (Canônico) | Termos Variantes / Outras Equipes | Diferença e Regra de Uso no DoaSync |
 | :--- | :--- | :--- |
-| **Campanha** | *Projeto* (README / DER inicial), *Causa*, *Ação* | **Campanha** é a unidade ativa de arrecadação com período definido (início/fim), meta financeira e/ou de itens, vinculada a uma Entidade. **Projeto** refere-se apenas à iniciativa social contínua ou estrutura legada do DER inicial; nas interfaces e APIs, deve-se usar **Campanha**. |
-| **Entidade** | *Instituição*, *ONG*, *Organização*, *Entidade Assistencial* | **Entidade** (`ENTIDADE`) é a organização sem fins lucrativos cadastrada para receber doações e gerir campanhas. *Instituição* e *ONG* são aceitos apenas como sinónimos descritivos em textos de interface (UX), nunca como nome de recurso na API ou banco de dados. |
-| **Doador (PF / PJ)** | *Usuário*, *Contribuinte*, *Apoiador* | **Usuário** (`USUARIO`) é a entidade base de autenticação do sistema. **Doador** é o perfil de acesso (`ROLE_DOADOR`) que realiza contribuições, podendo ser **Pessoa Física (PF)** — identificada por CPF e maior de 18 anos — ou **Pessoa Jurídica (PJ)** — identificada por CNPJ. |
-| **Triagem** | *Homologação*, *Aprovação de Cadastro*, *Conferência Física* | Possui dois contextos distintos no sistema que não devem ser misturados: <br>1. **Triagem Cadastral (Onboarding):** análise administrativa dos documentos (CNPJ/estatuto) para aprovar ou reprovar uma Entidade (`PENDENTE` → `APROVADA`/`REPROVADA`). <br>2. **Triagem / Conferência de Itens:** inspeção física realizada pela Entidade ao receber doações materiais antes de dar entrada no estoque. |
-| **Prestação de Contas** | *Encerramento*, *Transparência*, *Conciliação de Despesas* | Processo formal realizado pelo Gestor ao encerrar uma Campanha, detalhando a aplicação dos recursos arrecadados, saldo final e anexando comprovantes/notas fiscais para consulta pública e auditoria. |
-| **Doação Anônima** | *Doação Oculta*, *Doador Convidado (Guest)* | Doação em que os dados pessoais do doador (nome, e-mail, CPF/CNPJ, telefone) são ocultados da Entidade beneficiada e da exibição pública (conformidade LGPD), mantendo-se o vínculo interno apenas para o histórico privado do próprio doador. |
+| **Campanha** | *Projeto* (README / DER inicial), *Causa*, *Ação* | **Campanha** é a unidade ativa de arrecadação com período definido (início/fim) e meta financeira, vinculada a uma Entidade. **Projeto** refere-se apenas à iniciativa social contínua ou estrutura legada do DER inicial; nas interfaces e APIs, deve-se usar **Campanha**. |
+| **Entidade** | *Instituição*, *ONG*, *Organização*, *Entidade Assistencial* | **Entidade** é a organização sem fins lucrativos cadastrada para receber doações e gerir campanhas; sua conta de acesso tem `tipo ENTIDADE`. *Instituição* e *ONG* são aceitos apenas como sinônimos descritivos em textos de interface (UX), nunca como nome de recurso na API ou banco de dados. |
+| **Doador (PF / PJ)** | *Usuário*, *Contribuinte*, *Apoiador* | **Usuário** é a conta base de autenticação do sistema. **Doador** é o ator que realiza contribuições; não existe tipo `DOADOR` no código. O doador é um usuário com `tipo PESSOA_FISICA` (PF) — identificado por CPF e maior de 18 anos — ou `tipo PESSOA_JURIDICA` (PJ) — identificado por CNPJ. |
+| **Triagem** | *Homologação*, *Aprovação de Cadastro*, *Conferência Física* | No MVP, **Triagem** é apenas a **triagem cadastral (onboarding)**: análise administrativa dos dados da Entidade para aprová-la ou reprová-la (`PENDENTE` → `APROVADA`/`REPROVADA`). A triagem/conferência física de itens doados está **fora do MVP**. |
+| **Prestação de Contas** | *Encerramento*, *Transparência*, *Conciliação de Despesas* | **Fora do MVP** (proposta para pós-MVP). Processo formal realizado pela Entidade ao encerrar uma Campanha, detalhando a aplicação dos recursos arrecadados, saldo final e anexando comprovantes/notas fiscais. |
+| **Doação Anônima** | *Doação Oculta* | Doação em que os dados pessoais do doador (nome, e-mail, CPF/CNPJ, telefone) são ocultados da Entidade beneficiada e da exibição pública (conformidade LGPD), mantendo-se o vínculo interno apenas para o histórico privado do próprio doador. Exige conta autenticada: não se confunde com checkout de convidado (*guest*), que está fora do MVP. |
+
+### 1.1 Atores × tipo de usuário no código
+
+Cada usuário tem **um único** `TipoUsuario`. Não existem os papéis `DOADOR`, `GESTOR` ou `ADMINISTRADOR` no código.
+
+| Ator (documentação / UX) | `TipoUsuario` |
+| :--- | :--- |
+| Doador Pessoa Física | `PESSOA_FISICA` |
+| Doador Pessoa Jurídica | `PESSOA_JURIDICA` |
+| Gestor de entidade | `ENTIDADE` |
+| Administrador | `ADMIN` |
 
 ---
 
 ## 2. Glossário Alfabético do Domínio
 
 ### A
-* **Administrador (Admin):** Perfil de acesso (`ADMINISTRADOR`) responsável pela governança global da plataforma, incluindo triagem/homologação de entidades, desativação de campanhas por violação de políticas e monitoramento de indicadores gerais (KPIs).
-* **Agendamento:** Reserva de data, turno/horário e modalidade (**Entrega na Sede** ou **Retirada em Domicílio**) vinculada a uma doação de itens físicos.
-* **Almoxarifado / Controle de Estoque:** Módulo operacional da Entidade destinado ao registo de entradas (após conferência física), saídas/destinações e saldo atualizado de suprimentos doados.
+* **Administrador (Admin):** Usuário com `tipo ADMIN`, responsável pela governança global da plataforma, incluindo triagem de entidades, desativação de campanhas por violação de políticas e monitoramento de indicadores gerais (KPIs).
+* **Agendamento:** **Fora do MVP.** Reserva de data, turno/horário e modalidade (**Entrega na Sede** ou **Retirada em Domicílio**) vinculada a uma doação de itens físicos.
+* **Almoxarifado / Controle de Estoque:** **Fora do MVP.** Módulo operacional da Entidade destinado ao registro de entradas (após conferência física), saídas/destinações e saldo atualizado de suprimentos doados.
 
 ### C
-* **Campanha:** Iniciativa temporal de arrecadação criada por uma Entidade aprovada, contendo título, descrição, categoria, nível de urgência, período de vigência e metas financeiras e/ou de itens. Passa pelos estados: `RASCUNHO`, `AGENDADA`, `ATIVA`, `ENCERRADA` e `DESATIVADA`.
-* **Comprovante / Recibo de Doação:** Documento digital (visualização em ecrã e download em PDF) emitido após a confirmação da doação, contendo código identificador único (ex.: `DS-1080`), data, valor/itens e destino.
-* **Conferência Física:** Ato de validar presencialmente a quantidade e o estado de conservação dos itens físicos entregues ou recolhidos, alterando o estado da doação de `PENDENTE` para `CONCLUÍDA`.
+* **Campanha:** Iniciativa temporal de arrecadação criada por uma Entidade aprovada, contendo título, descrição, período de vigência e meta financeira. Passa pelos estados de `StatusCampanha`: `RASCUNHO`, `AGENDADA`, `ATIVA`, `ENCERRADA` e `DESATIVADA`.
+* **Comprovante / Recibo de Doação:** Documento digital exibido em tela após a confirmação da doação, contendo código identificador único (ex.: `DS-1080`), data, valor e destino.
+* **Conferência Física:** **Fora do MVP.** Ato de validar presencialmente a quantidade e o estado de conservação dos itens físicos entregues ou coletados.
 
 ### D
-* **Doação:** Contribuição voluntária realizada por um Doador para uma Campanha ativa ou diretamente para uma Entidade aprovada. Classifica-se quanto à natureza em **Doação Financeira** (monetária, via PIX, cartão ou boleto) ou **Doação de Itens** (bens materiais).
-* **Doação Recorrente (Lembrete):** Modalidade de apoio periódico (ex.: semanal/mensal) configurada pelo doador na interface para lembretes de nova contribuição, sem débito automático bancário no MVP.
-* **Doador:** Perfil de utilizador (`DOADOR`) habilitado a explorar campanhas, efetuar doações financeiras ou materiais, agendar entregas, emitir recibos e consultar o seu histórico individual.
+* **Doação:** Contribuição financeira voluntária realizada por um Doador para uma Campanha ativa ou diretamente para uma Entidade aprovada. No MVP o pagamento é por PIX simulado, e a doação já é registrada como `CONFIRMADA`. Status (`StatusDoacao`): `PENDENTE`, `CONFIRMADA` e `CANCELADA`. A **doação de itens** (bens materiais) está **fora do MVP**.
+* **Doação Recorrente (Lembrete):** **Fora do MVP.** Modalidade de apoio periódico (ex.: semanal/mensal) configurada pelo doador para lembretes de nova contribuição, sem débito automático bancário.
+* **Doador:** Usuário com `tipo PESSOA_FISICA` ou `PESSOA_JURIDICA`, habilitado a explorar campanhas, efetuar doações financeiras, consultar comprovantes e consultar o seu histórico individual.
 * **Doador PF / PJ:** Especialização cadastral do Doador: **Pessoa Física (PF)**, vinculada a um CPF válido (idade mínima de 18 anos), e **Pessoa Jurídica (PJ)**, vinculada a um CNPJ válido e razão social.
 
 ### E
-* **Encerramento de Campanha:** Finalização definitiva de uma campanha (por expiração da data limite ou ação manual do Gestor), bloqueando o recebimento de novas doações e habilitando a etapa de Prestação de Contas.
-* **Entidade (Entidade Assistencial):** Organização da sociedade civil sem fins lucrativos cadastrada no DoaSync. Inicia com estado `PENDENTE` e só pode publicar campanhas ou receber doações após atingir o estado `APROVADA`.
+* **Encerramento de Campanha:** Finalização definitiva de uma campanha (por expiração da data limite, ação manual da Entidade ou inativação da Entidade), bloqueando o recebimento de novas doações.
+* **Entidade (Entidade Assistencial):** Organização da sociedade civil sem fins lucrativos cadastrada no DoaSync. Status (`StatusEntidade`): `PENDENTE`, `APROVADA`, `REPROVADA` e `INATIVA`. Inicia como `PENDENTE` e só pode publicar campanhas ou receber doações após atingir `APROVADA`. Ao virar `INATIVA`, suas campanhas ativas e agendadas são encerradas.
 
 ### G
-* **Gestor de Entidade:** Perfil de utilizador (`GESTOR`) vinculado a uma única Entidade, com permissão para criar/editar campanhas, conferir doações recebidas, gerir estoque e publicar prestações de contas exclusivamente da sua instituição.
+* **Gestor de Entidade:** Pessoa que opera a conta da Entidade (`tipo ENTIDADE`), com permissão para criar/editar campanhas e consultar doações recebidas exclusivamente da sua instituição.
 
 ### M
-* **Meta Híbrida:** Configuração de campanha que combina simultaneamente um objetivo financeiro (em Reais — BRL) e uma lista quantitativa de itens físicos necessários.
+* **Meta Híbrida:** **Fora do MVP.** Configuração de campanha que combina um objetivo financeiro (em Reais — BRL) e uma lista quantitativa de itens físicos necessários.
 
 ### O
-* **Onboarding de Entidade:** Fluxo de registo inicial de uma organização na plataforma, exigindo dados institucionais, endereço, dados do responsável legal e envio de documentos comprobatórios em PDF para triagem administrativa.
+* **Onboarding de Entidade:** Fluxo de registro inicial de uma organização na plataforma, exigindo dados institucionais, endereço e dados do responsável legal para triagem administrativa.
 
 ### P
-* **Prestação de Contas:** Relatório consolidado de encerramento de campanha que demonstra a destinação dos valores e itens arrecadados, acompanhado de comprovantes fiscais e relato final à comunidade.
-* **Projeto:** Termo utilizado na conceção inicial do sistema (DER v1) para designar iniciativas sociais das entidades; na arquitetura atual do produto, foi consolidado sob o conceito operacional de **Campanha**.
+* **Prestação de Contas:** **Fora do MVP.** Relatório consolidado de encerramento de campanha que demonstra a destinação dos valores arrecadados, acompanhado de comprovantes fiscais e relato final à comunidade.
+* **Projeto:** Termo utilizado na concepção inicial do sistema (DER v1) para designar iniciativas sociais das entidades; na arquitetura atual do produto, foi consolidado sob o conceito operacional de **Campanha**.
 
 ### R
-* **Rascunho:** Estado inicial de uma campanha salva durante o assistente de criação (*wizard*) antes de ser revisada e publicada oficialmente para o público.
+* **Rascunho:** Status `RASCUNHO` de uma campanha salva antes de ser publicada para o público.
 
 ### T
-* **Timeline Comunitária:** Mural cronológico dentro da página de acompanhamento da campanha onde o Gestor publica atualizações, fotos e marcos de progresso para os doadores.
-* **Triagem:** Etapa de verificação e filtragem antes da efetivação de um registo no sistema, aplicada tanto à análise documental de novas Entidades pelo Administrador quanto à conferência de itens físicos recebidos pela Entidade.
+* **Timeline Comunitária:** **Fora do MVP.** Mural cronológico na página de acompanhamento da campanha onde a Entidade publica atualizações, fotos e marcos de progresso para os doadores.
+* **Triagem:** Etapa de verificação antes da efetivação de um registro no sistema. No MVP, aplica-se à análise das novas Entidades pelo Administrador; a triagem física de itens recebidos está **fora do MVP**.
 
 ### U
-* **Usuário:** Conta base de acesso ao DoaSync (`USUARIO`), composta por credenciais de autenticação (e-mail e senha armazenada em hash) e associada a um ou mais papéis de autorização (`DOADOR`, `GESTOR`, `ADMINISTRADOR`).
+* **Usuário:** Conta base de acesso ao DoaSync, composta por credenciais de autenticação (e-mail e senha armazenada em hash) e por um único tipo (`TipoUsuario`): `PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE` ou `ADMIN`.
 
 ---
 
@@ -73,10 +86,10 @@ A tabela abaixo estabelece o **termo canônico oficial** do projeto frente às v
 | Sigla / Termo | Significado no Contexto do Projeto |
 | :--- | :--- |
 | **CA / CT** | **Critério de Aceite** (especificado em Gherkin: `Dado / Quando / Então`) e **Caso de Teste** (roteiro de verificação de QA). |
-| **DER** | **Diagrama Entidade-Relacionamento**, modelo conceptual da base de dados PostgreSQL do DoaSync. |
-| **IDOR** | *Insecure Direct Object Reference* — vulnerabilidade testada para garantir que um Gestor não aceda a dados de outra Entidade alterando IDs na URL/API. |
+| **DER** | **Diagrama Entidade-Relacionamento**, modelo conceitual do banco de dados PostgreSQL do DoaSync. |
+| **IDOR** | *Insecure Direct Object Reference* — vulnerabilidade testada para garantir que um usuário `ENTIDADE` não acesse dados de outra Entidade alterando IDs na URL/API. |
 | **LGPD** | **Lei Geral de Proteção de Dados**, diretriz que rege o consentimento no cadastro, mascaramento de dados sensíveis e suporte à Doação Anônima. |
 | **MVP** | *Minimum Viable Product* — escopo prioritário definido em `definicao-mvp.md` (DOC-04). |
-| **RBAC** | *Role-Based Access Control* — controlo de acesso baseado nos perfis `DOADOR`, `GESTOR` e `ADMINISTRADOR` via token JWT. |
+| **RBAC** | *Role-Based Access Control* — controle de acesso baseado no `TipoUsuario` (`PESSOA_FISICA`, `PESSOA_JURIDICA`, `ENTIDADE`, `ADMIN`) via token JWT. |
 | **RF / RNF** | **Requisito Funcional** e **Requisito Não Funcional**. |
-| **Shift-Left** | Prática adotada pela equipa de QA para antecipar a análise de inconsistências entre protótipos (Figma) e requisitos antes da implementação. |
+| **Shift-Left** | Prática adotada pela equipe de QA para antecipar a análise de inconsistências entre protótipos (Figma) e requisitos antes da implementação. |

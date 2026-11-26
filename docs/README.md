@@ -25,6 +25,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | [requisitos.md](./requisitos.md) | Requisitos funcionais e não funcionais | Documentação |
 | [funcionalidades.md](./funcionalidades.md) | Funcionalidades organizadas por módulo | Documentação |
 | [regras-negocio.md](./regras-negocio.md) | Regras de negócio (RNxx), **fonte única das regras** | Documentação |
+| [glossario.md](./glossario.md) | Glossário do domínio: termos canônicos, tipos de usuário e status | Documentação |
 | [wireframes.md](./wireframes.md) | Wireframes das telas principais | Coordenação |
 | [manuais/manual-doador.md](./manuais/manual-doador.md) | Manual do usuário: doador | Documentação |
 | [manuais/manual-entidade-admin.md](./manuais/manual-entidade-admin.md) | Manual do usuário: entidade e administrador | Documentação |
@@ -50,7 +51,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 | Documento | Assunto | Dono | Origem |
 |---|---|---|---|
 | [backend/contrato-api.md](./backend/contrato-api.md) | **Contrato consolidado da API** — 22 rotas com método, path, perfil de acesso, request, response, erros e status (✅ implementada / 🔧 planejada) | Back | — |
-| [backend/rotas-api.md](./backend/rotas-api.md) | Contrato da API: requisição e resposta (JSON) de cada rota — referência histórica; ver `contrato-api.md` | Back | — |
+| [backend/rotas-api.md](./backend/rotas-api.md) | Redirecionamento para `contrato-api.md` (o conteúdo antigo fica no histórico do git) | Back | — |
 | [routes-plan.md](./routes-plan.md) | Planejamento da API: decisões, dependências, ordem de implementação e problemas encontrados | Back | — |
 | [backend/pipeline-ci-cd.md](./backend/pipeline-ci-cd.md) | Guia de pipeline CI/CD do backend | Back | — |
 | [backend/cenarios-testes-api.md](./backend/cenarios-testes-api.md) | Cenários de teste da API | QA | `quality` |
@@ -76,6 +77,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 |---|---|---|---|
 | [qa/Grupo 5 - Escopo de Trabalho.md](<./qa/Grupo 5 - Escopo de Trabalho.md>) | Escopo e responsabilidades do grupo de QA | QA | — |
 | [qa/plano-de-testes-manuais.md](./qa/plano-de-testes-manuais.md) | Plano de testes manuais | QA | `quality` |
+| [qa/criterios-aceite-mvp.md](./qa/criterios-aceite-mvp.md) | Critérios de aceite (Gherkin) das funcionalidades do MVP | QA | `quality` |
 | [qa/matriz-rastreabilidade.md](./qa/matriz-rastreabilidade.md) | Matriz de rastreabilidade | QA | `quality` |
 | [qa/relatorio-qa-shiftleft-sprint2.md](./qa/relatorio-qa-shiftleft-sprint2.md) | Relatório shift-left (Sprint 2) | QA | `quality` |
 | [qa/pipeline-ci-cd.md](./qa/pipeline-ci-cd.md) | Guia de pipeline CI/CD | QA | — |

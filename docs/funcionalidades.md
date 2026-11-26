@@ -94,6 +94,43 @@ Responsável pelo gerenciamento geral da plataforma e acompanhamento dos indicad
 
 ---
 
+## Equivalência de numeração
+
+A numeração oficial dos requisitos funcionais é a de [requisitos.md](./requisitos.md) (RF-001 a RF-030). Critérios de aceite, matriz de rastreabilidade e definição do MVP usam essa numeração. A tabela abaixo relaciona os IDs RF01–RF26 deste documento aos IDs oficiais.
+
+| Funcionalidade | Requisito oficial |
+|---|---|
+| RF01 — Cadastrar doador | RF-001 |
+| RF02 — Cadastrar entidade assistencial | RF-006 |
+| RF03 — Realizar login e logout | RF-002, RF-003 |
+| RF04 — Recuperar senha por e-mail | RF-002 |
+| RF05 — Editar perfil | RF-004 |
+| RF06 — Controle de perfis de acesso | RF-005, RF-007 |
+| RF07 — Cadastrar e editar informações institucionais | RF-006 |
+| RF08 — Visualizar perfil público da entidade | RF-008 |
+| RF09 — Aprovar ou reprovar cadastro de entidade | RF-009 |
+| RF10 — Desativar entidade | RF-009 |
+| RF11 — Criar campanhas de arrecadação | RF-010, RF-012 |
+| RF12 — Visualizar campanhas ativas | RF-014 |
+| RF13 — Encerrar campanha antecipadamente | RF-013 |
+| RF14 — Visualizar progresso de arrecadação | RF-015 |
+| RF15 — Desativar campanhas que violem políticas | RF-013 |
+| RF16 — Realizar doação para campanha ou entidade | RF-020 |
+| RF17 — Registrar informações da doação | RF-021 |
+| RF18 — Emitir confirmação de doação | RF-023, RF-025 |
+| RF19 — Realizar doação anônima | RF-021 |
+| RF20 — Realizar pagamento digital (ex.: PIX) | RF-022 |
+| RF21 — Visualizar histórico de suas doações | RF-024 |
+| RF22 — Visualizar histórico de doações recebidas por campanha | RF-027 |
+| RF23 — Acompanhar valor total arrecadado por período | RF-027 |
+| RF24 — Acessar painel administrativo | RF-028 |
+| RF25 — Visualizar indicadores gerais da plataforma | RF-028 |
+| RF26 — Gerenciar entidades, usuários e campanhas | RF-005, RF-009 |
+
+RF-011 (edição de campanha) e RF-026 (painel de campanhas da entidade) não têm funcionalidade própria neste documento. RF-016 a RF-019, RF-029 e RF-030 também não têm, e estão fora do MVP ou só parcialmente dentro dele (ver [definicao-mvp.md](./definicao-mvp.md)).
+
+---
+
 ## Regras de Negócio Complementares
 
 O documento de referência das regras de negócio é o [`regras-negocio.md`](regras-negocio.md). Ele contém as regras RN01 a RN77 e a tabela de pendências. As regras abaixo (RN41 em diante) estão replicadas lá, na seção 8. Elas cobrem lacunas encontradas ao cruzar as funcionalidades com o [mapeamento de entidades](entidades-envolvidas.md) e com o [levantamento de necessidades](Levantamento-de-necessidade.md).
