@@ -1,6 +1,6 @@
 # Guia de Contribuição — DoaSync
 
-Este guia vale para os 4 repositórios da organização: `doa-sync`, `doasync-backend`, `doasync-frontend` e `quality`. As exceções estão indicadas na seção 8.
+Este guia vale para os 4 repositórios da organização: `doa-sync`, `doasync-backend`, `doasync-frontend` e `quality`. As exceções por repositório estão na seção 8.
 
 ## 1. Fluxo de branches
 
@@ -10,7 +10,7 @@ feature/* ──► develop ──► main
 
 | Branch | Uso | Quem altera |
 |---|---|---|
-| `main` | Entregas integradas e validadas | Somente por PR vindo de `develop` |
+| `main` | Entregas integradas e validadas | Somente por PR |
 | `develop` | Integração do trabalho em andamento. O código das aplicações vive aqui | Somente por PR vindo de uma branch de trabalho |
 | `feature/*`, `fix/*`, `docs/*` | Trabalho individual | Quem abriu a branch |
 
@@ -18,12 +18,12 @@ Regras:
 
 - Nunca faça commit direto em `main` ou `develop` (RNF-019).
 - Abra a branch de trabalho a partir da `develop` mais recente.
-- Uma branch resolve uma issue. Branches longas e com assuntos misturados dificultam a revisão.
+- Uma branch resolve uma issue. Branches longas com assuntos misturados dificultam a revisão.
 - Apague a branch depois do merge.
 
 ## 2. Nome de branch
 
-Formato: `<tipo>/<id-da-issue>-<descricao-curta>`, em minúsculas e com hífen.
+Formato padrão: `<tipo>/<id-da-issue>-<descricao-curta>`, em minúsculas e com hífen.
 
 | Tipo | Quando usar | Exemplo |
 |---|---|---|
@@ -33,6 +33,8 @@ Formato: `<tipo>/<id-da-issue>-<descricao-curta>`, em minúsculas e com hífen.
 | `feat/` | Tarefa de definição ou planejamento | `feat/147-stack-definition` |
 
 Em issues de módulo, use o código da task (por exemplo `cam-t08`). Nas demais, use o número da issue.
+
+> **Branches criadas pelo botão "Create a branch" da issue no GitHub** também são aceitas, mesmo que o nome gerado pelo GitHub não siga exatamente o formato acima (exemplo: `185-doc-06-criterios-de-aceite`). O importante é que a branch referencie a issue.
 
 ## 3. Mensagem de commit
 
@@ -77,11 +79,13 @@ Toda tarefa começa por uma issue. Use o modelo abaixo (o formato das tasks `CAM
 
 Cada issue deve ter responsável, label de prioridade (Alta, Média ou Baixa), label de tamanho (P, M ou G) e label da sprint.
 
+A issue [#41 (Organizar as Branches)](https://github.com/PrjDoaSync/doa-sync/issues/41) foi encerrada com este guia como referência.
+
 ## 5. Pull Requests
 
-1. Atualize sua branch com a `develop` e resolva conflitos localmente.
+1. Atualize sua branch com a `develop` (ou `main` no caso do `doa-sync`) e resolva conflitos localmente.
 2. Rode build e testes localmente (veja a seção 7).
-3. Abra o PR para `develop` (ou de `develop` para `main`, na entrega).
+3. Abra o PR para `develop` — ou diretamente para `main` no `doa-sync` (veja exceções na seção 8).
 4. Título no mesmo padrão do commit. Descrição com o que mudou, por quê e como testar.
 5. Referencie a issue com `Closes #NN`.
 6. Peça revisão a pelo menos 1 membro que não seja o autor.
@@ -95,7 +99,7 @@ Copie para a descrição do PR:
 - [ ] A issue está referenciada (`Closes #NN`)
 - [ ] Build passa localmente
 - [ ] Testes automatizados passam
-- [ ] Novos comportamentos têm testes ou justificativa
+- [ ] Novos comportamentos têm testes ou justificativa de ausência
 - [ ] Documentação atualizada (endpoint, componente, regra de negócio ou README afetado)
 - [ ] Se o documento tem cópia em `doa-sync/docs`, a cópia foi atualizada
 - [ ] Sem segredos, tokens ou dados pessoais reais no código e nos logs
@@ -115,17 +119,19 @@ Conforme [`docs/sprints/README.md`](./docs/sprints/README.md), uma entrega só e
 
 | Repositório | Comando |
 |---|---|
-| `doasync-backend` | `./mvnw package` e `./mvnw test` |
+| `doasync-backend` | `./mvnw package` e `./mvnw test` (na pasta `backend/`) |
 | `doasync-frontend` | em `web/`: `npm install`, `npm run lint`, `npm run build` e `npm test` |
-| `quality` | o `README.md` do repositório ainda está vazio. Documente aqui o comando ao preenchê-lo |
-| `doa-sync` | sem build. Confira links e a renderização do Markdown |
+| `quality` | ver README do repositório `quality` (pendente — seção 8) |
+| `doa-sync` | sem build. Verifique links e a renderização do Markdown |
 
 ## 8. Exceções por repositório
 
 | Repositório | Exceção |
 |---|---|
-| `doa-sync` | Não há testes automatizados. O critério de pronto vale para a documentação: revisão e links válidos. A `main` é a branch de documentação e recebe PRs das branches `docs/*` e demais de trabalho |
-| `quality` | O repositório contém os testes. O "teste verde" do critério de pronto significa a suíte nova passando e sem quebrar as existentes |
+| `doa-sync` | Não há testes automatizados nem CI. O critério de pronto é: revisão e links válidos. A `main` recebe PRs diretos das branches `docs/*` e de trabalho, sem passar pela `develop`. |
+| `doasync-backend` | Tem CI (GitHub Actions em `.github/workflows/backend-tests.yml`): build e testes rodam automaticamente em push e PR para `main` e `develop`. |
+| `doasync-frontend` | Tem CI (GitHub Actions em `.github/workflows/frontend-qa.yml`). |
+| `quality` | Não tem CI configurado (sem `.github/workflows`). Os comandos de execução dos testes estão pendentes no README do repositório. Enquanto não estiverem documentados, consulte diretamente a equipe de QA. |
 
 ## 9. Documentação
 
