@@ -20,18 +20,20 @@ Escopo completo em [`docs/definicao-mvp.md`](./docs/definicao-mvp.md) e [`docs/f
 
 O projeto está dividido em 4 repositórios da organização [PrjDoaSync](https://github.com/PrjDoaSync).
 
-| Repositório | O que contém | Branch com o código |
+| Repositório | O que contém | Branch mais atual |
 |---|---|---|
 | [`doa-sync`](https://github.com/PrjDoaSync/doa-sync) (este) | Documentação central: requisitos, regras de negócio, modelo de dados, arquitetura, sprints | `main` |
-| [`doasync-backend`](https://github.com/PrjDoaSync/doasync-backend) (privado) | API REST em Java 17 e Spring Boot, migrações Flyway | `develop` |
-| [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) | Aplicação web em React + Vite, em `web/` | `develop` |
+| [`doasync-backend`](https://github.com/PrjDoaSync/doasync-backend) (privado) | API REST em Java 17 e Spring Boot, migrações Flyway | `main` (ver nota) |
+| [`doasync-frontend`](https://github.com/PrjDoaSync/doasync-frontend) | Aplicação web em React + Vite, em `web/` | `main` (ver nota) |
 | [`quality`](https://github.com/PrjDoaSync/quality) | Testes automatizados de API e interface, plano de testes manuais | `develop` |
 
-O código de aplicação vive na branch `develop` de cada repositório de código. A `main` recebe as entregas já integradas e validadas. Regras de branches e PRs em [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+O fluxo combinado é `feature/*` → `develop` → `main`: a `develop` integra o trabalho em andamento e a `main` recebe as entregas validadas. Regras de branches e PRs em [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+
+> **Nota (26/11/2026):** no `doasync-backend` e no `doasync-frontend`, a `main` está à frente da `develop`. A integração do frontend com a API (PR #145 do front) e a correção de CORS do backend (PR #70 do back) entraram direto na `main`. Até as equipes sincronizarem a `develop`, a versão mais recente do código está na `main`.
 
 ## Modelo de dados
 
-As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V6`) e o diagrama [`docs/DER.png`](./docs/DER.png). A descrição detalhada está em [`docs/entidades-envolvidas.md`](./docs/entidades-envolvidas.md).
+As entidades abaixo seguem as migrações Flyway do backend (`V1` a `V6`). O dicionário de dados completo, o DER atualizado e as divergências em relação ao diagrama original ([`docs/DER.png`](./docs/DER.png)) estão em [`docs/modelo-de-dados.md`](./docs/modelo-de-dados.md).
 
 | Entidade (tabela) | Descrição |
 |---|---|
@@ -72,4 +74,4 @@ O planejamento por sprint e por stack está em [`docs/sprints/README.md`](./docs
 
 ## Proteção de branches
 
-No `doa-sync`, a `main` e a `dev-frontend` são protegidas: merge somente por pull request com pelo menos uma aprovação, sem force push. A `main` deste repositório recebe PRs diretos das branches `docs/*` e de trabalho. Nos outros três repositórios, o fluxo `feature/*` → `develop` → `main` é acordo de equipe, sem bloqueio técnico.
+No `doa-sync`, a `main` e a `dev-frontend` são protegidas: merge somente por pull request com pelo menos uma aprovação, sem force push. A `main` deste repositório recebe PRs diretos das branches `docs/*` e de trabalho. Nos outros três repositórios, o fluxo `feature/*` → `develop` → `main` é acordo de equipe, sem bloqueio técnico (ver a nota em [Organização dos repositórios](#organização-dos-repositórios)).
