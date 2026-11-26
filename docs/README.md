@@ -82,6 +82,7 @@ Ponto de entrada de toda a documentação do projeto. O `doa-sync` **centraliza*
 
 | Documento | Assunto | Dono |
 |---|---|---|
+| [../CONTRIBUTING.md](../CONTRIBUTING.md) | Guia de contribuição: branches, commits, PRs e issues | Documentação |
 | [sprints/README.md](./sprints/README.md) | Planejamento geral das sprints | Coordenação |
 | [sprints/sprint-backend.md](./sprints/sprint-backend.md) | Sprint do backend | Back |
 | [sprints/sprint-banco.md](./sprints/sprint-banco.md) | Sprint do banco de dados | Back |
